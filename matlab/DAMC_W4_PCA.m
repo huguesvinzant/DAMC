@@ -67,8 +67,6 @@ for i = 1:outer_folds
         
         [inner_coeff, inner_PCA_data, ~, ~, explained_var, mu] = pca(inner_train_data);
         inner_PCA_data_te = (inner_test_data - mu) * inner_coeff;
-
-        %tot_inner_variance(j,:) = cumsum(explained_var(1:200));
         
         for N_sel = 1:length(explained_var)
             
@@ -87,9 +85,6 @@ for i = 1:outer_folds
     mean_error = mean(error_val, 1);
     [min_error(i), best_N(i)] = min(mean_error);
     
-%     mean_var = mean(tot_inner_variance, 1);
-%     best_var(i) = mean_var(best_N(i));
-    
     [outer_train_data, mu, sigma] = zscore(outer_train_data, 0, 1);
     outer_test_data = (outer_test_data - mu)./sigma;
 
@@ -104,18 +99,3 @@ for i = 1:outer_folds
 
     classification_error_test(i) = classification_errors(outer_test_labels, outer_label_prediction);
 end
-
-
-% %%
-% 
-% [std_data, mu, sigma] = zscore(trainData, 0, 1);
-% std_data_te = (testData - mu)./sigma;
-% 
-% outter_coeff = pca(std_data);
-% inner_PCA_data = std_data * outter_coeff;
-% inner_PCA_data_te = std_data_te * outter_coeff;
-% 
-% inner_classifier = fitcdiscr(inner_PCA_data, trainLabels, 'discrimtype', 'diaglinear');
-% pred = predict(inner_classifier, inner_PCA_data_te);
-% 
-% labelToCSV(pred, 'PCA_diaglinear.csv', 'csv')
