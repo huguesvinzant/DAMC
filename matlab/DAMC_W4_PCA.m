@@ -16,28 +16,30 @@ Cov = cov(trainData);
 %covariance matrix of the data projected on the PCs
 Cov_PCA = cov(score);
 
-variance = variance/(sum(variance)) * 100;
-
-figure
+figure(1)
 subplot(1,2,1),
-imshow(Cov * 100); %=> the image is too large to apply this function
+imshow(Cov * 100), %=> the image is too large to apply this function
+title('Covariance of the raw data')
 subplot(1,2,2),
-imshow(Cov_PCA * 100);
+imshow(Cov_PCA * 100),
+title('Covariance of the PCA data')
 
-modified_cov = Cov - diag(10*ones(2048,1)); 
-modified_cov_PCA = Cov_PCA - diag(10*ones(596,1)); 
-
-value = max(max(modified_cov));
-value_pca = max(max(modified_cov_PCA));
+% modified_cov = Cov - diag(10*ones(2048,1)); 
+% modified_cov_PCA = Cov_PCA - diag(10*ones(596,1)); 
+% 
+% value = max(max(modified_cov));
+% value_pca = max(max(modified_cov_PCA));
 
 variance_cum = cumsum(variance);
 
-figure
+figure(2)
 plot(variance_cum)
+title('Cumulative sum of the variance')
+xlabel('Feature'), ylabel('Variance %')
 
 %% 
 
-outer_folds = 10;
+outer_folds = 2;
 inner_folds = 5;
 
 outer_cvpartition = cvpartition(trainLabels,'kfold',outer_folds);
@@ -69,12 +71,12 @@ for i = 1:outer_folds
         inner_PCA_data = inner_train_data * inner_coeff;
         inner_PCA_data_te = inner_test_data * inner_coeff;
         
-        for N_sel = 1:length(inner_PCA_data(1,:))
+        for N_sel = 1:(length(inner_PCA_data(1,:)))
             
             train_data_sel = inner_PCA_data(:,1:N_sel);
             val_data_sel = inner_PCA_data_te(:,1:N_sel);
             
-            inner_classifier = fitcdiscr(train_data_sel, inner_train_labels, 'discrimtype', 'diaglinear');
+            inner_classifier = fitcdiscr(train_data_sel, inner_train_labels, 'discrimtype', 'diagquadratic');
 
             inner_label_prediction = predict(inner_classifier, train_data_sel);
             inner_label_prediction_val = predict(inner_classifier, val_data_sel);
@@ -87,6 +89,7 @@ for i = 1:outer_folds
         end
     end
     
+    error_val(error_val == 0) = 1; % need to find another way to do that (ignore the zeros)
     mean_error = mean(error_val, 1);
     [min_error(i), best_N(i)] = min(mean_error);
     
@@ -99,7 +102,7 @@ for i = 1:outer_folds
     
     outer_train_data_sel = outer_PCA_data(:,1:best_N(i));
     outer_test_data_sel = outer_PCA_data_te(:,1:best_N(i));
-    outer_classifier = fitcdiscr(outer_train_data_sel, outer_train_labels, 'discrimtype', 'diaglinear');
+    outer_classifier = fitcdiscr(outer_train_data_sel, outer_train_labels, 'discrimtype', 'diagquadratic');
 
     outer_label_prediction = predict(outer_classifier, outer_test_data_sel);
 
@@ -108,16 +111,16 @@ for i = 1:outer_folds
 end
 
 
-%%
-
-[std_data, mu, sigma] = zscore(trainData, 0, 1);
-std_data_te = (testData - mu)./sigma;
-
-outter_coeff = pca(std_data);
-inner_PCA_data = std_data * outter_coeff;
-inner_PCA_data_te = std_data_te * outter_coeff;
-
-inner_classifier = fitcdiscr(inner_PCA_data, trainLabels, 'discrimtype', 'diaglinear');
-pred = predict(inner_classifier, inner_PCA_data_te);
-
-labelToCSV(pred, 'PCA_diaglinear.csv', 'csv')
+% %%
+% 
+% [std_data, mu, sigma] = zscore(trainData, 0, 1);
+% std_data_te = (testData - mu)./sigma;
+% 
+% outter_coeff = pca(std_data);
+% inner_PCA_data = std_data * outter_coeff;
+% inner_PCA_data_te = std_data_te * outter_coeff;
+% 
+% inner_classifier = fitcdiscr(inner_PCA_data, trainLabels, 'discrimtype', 'diaglinear');
+% pred = predict(inner_classifier, inner_PCA_data_te);
+% 
+% labelToCSV(pred, 'PCA_diaglinear.csv', 'csv')
