@@ -1,27 +1,35 @@
+%Project DAMC
+%Group n° ????
+%Mitchell Camille
+%Perier Marion
+%Vinzant Hugues
+
+%% Clear variables
 clear variables
 close all
 clc
 
-%% Load data
-
+%% Loading of the data
+load('testSet.mat'); 
+load('trainLabels.mat'); 
 load('trainSet.mat');
-load('trainLabels.mat');
-load('testSet.mat');
 
-%% Statistical significance
-
-%% Histograms
-
+%% Creation of the 2 classes
 % The label "0" corresponds to "correct movement".
 % The label "1" corresponds to "erroneous movement".
 correct_movement = find(trainLabels == 0);
 erroneous_movement = find(trainLabels == 1);
+
+%% Data exploration
+
+%% Histograms
 
 % Useful features 650-800
 % Feature with similar distribution between the two classes
 feature_same_distrib = 665; 
 % Feature with different distribution between the two classes
 feature_diff_distrib = 710; 
+
 figure(1)
 subplot(1,2,1),
 histogram(trainData(correct_movement(:),feature_same_distrib),...
@@ -66,28 +74,9 @@ subplot(2,2,4),
 boxplot(feature_diff_distrib_all,group,'Notch','on','Labels',{'Correct','Error'})
 title('Notched Boxplot for the feature with different distribution among classes')
 %The 'Notch' option displays the 95% confidence interval around the median.
-%The notches do not overlap in the case of feature 2 (different), meaning
-%that at a 95% confidence interval the true means do differ. This is not
+%The notches do not overlap in the case of feature that gves different distribution for the 2 classes, 
+%meaning that at a 95% confidence interval the true means do differ. This is not
 %the case for feature 1 (similar).
-
-%% t-test
-
-[descision1,p_value1] = ttest2(trainData(correct_movement,feature_same_distrib),...
-    trainData(erroneous_movement,feature_same_distrib));
-% descision = 0 --> We do not reject the null hypothesis (at 5%)
-% high p-value = 0.85 --> no significant difference between the mean values
-
-[descision2,p_value2] = ttest2(trainData(correct_movement,feature_diff_distrib),...
-    trainData(erroneous_movement,feature_diff_distrib));
-% descision = 1 --> We do reject the null hypothesis (at 5%)
-% low p-value = 1.20 * 10^-11 --> significant difference between the mean
-% values
-
-% We cannot use the t test for all the features beacause it only allows us
-% to compare them 2 by 2
-
-%t-test is only valid if the samples come from normal distributions with
-%equal covariances --> assumption may not be true for all features
 
 %% Feature thresholding
 
@@ -101,7 +90,7 @@ plot(trainData(erroneous_movement,feature_same_distrib),trainData(erroneous_move
 legend('Class 1 = correct movement','Class 2 = erroneous movement')
 % feature thresholding is only useful for 1 feature at a time
 
-%% 2 Feature thresholding 
+%% Choice of the threshold 
 
 %Determining the threshold by visually identifying where to separate the
 %two classes on the histogram using feature 710.
@@ -125,6 +114,25 @@ t1.Visible = 'on'; % set(t1,'Visible','on');
 
 %0.6 seems to be the most promising threshold of the two classes for
 %feature 2 (different)
+
+%% t-test
+
+[descision1,p_value1] = ttest2(trainData(correct_movement,feature_same_distrib),...
+    trainData(erroneous_movement,feature_same_distrib));
+% descision = 0 --> We do not reject the null hypothesis (at 5%)
+% high p-value = 0.85 --> no significant difference between the mean values
+
+[descision2,p_value2] = ttest2(trainData(correct_movement,feature_diff_distrib),...
+    trainData(erroneous_movement,feature_diff_distrib));
+% descision = 1 --> We do reject the null hypothesis (at 5%)
+% low p-value = 1.20 * 10^-11 --> significant difference between the mean
+% values
+
+% We cannot use the t test for all the features beacause it only allows us
+% to compare them 2 by 2
+
+%t-test is only valid if the samples come from normal distributions with
+%equal covariances --> assumption may not be true for all features
 
 %% Errors calculation
 
@@ -150,76 +158,18 @@ test_labels = (testData(:,feature_diff_distrib)<0);
 
 labelToCSV(test_labels, 'test_labels_threshold.csv', 'csv')
 
-%% LDA/QDA classifiers
+%% Training and testing error: data splitting
 
-features = trainData(:,1:100:end);
-
-%linear
-classifier = fitcdiscr(features, trainLabels, 'discrimtype', 'linear');
-label_prediction_linear = predict(classifier, features);
-[class_error_linear, classification_error_linear] = ...
-    classification_errors(trainLabels, label_prediction_linear);
-
-%diaglinear
-classifier = fitcdiscr(features, trainLabels, 'discrimtype', 'diaglinear');
-label_prediction_diaglinear = predict(classifier, features);
-[class_error_diaglinear, classification_error_diaglinear] = ...
-    classification_errors(trainLabels, label_prediction_diaglinear);
-
-%quadratic -> cannot be computed because one or more classes have 
-%singular covariance matrices.
-
-% classifier = fitcdiscr(features, trainLabels, 'discrimtype', 'quadratic');
-% label_prediction_quadratic = predict(classifier, features);
-% [class_error_quadratic, classification_error_quadratic] = ...
-%     classification_errors(trainLabels, label_prediction_quadratic);
-
-%diagquadratic
-classifier = fitcdiscr(features, trainLabels, 'discrimtype', 'diagquadratic');
-label_prediction_diagquadratic = predict(classifier, features);
-[class_error_diagquadratic, classification_error_diagquadratic] = ...
-    classification_errors(trainLabels, label_prediction_diagquadratic);
-
-% with different Prior
-
-%linear 'Prior' 'uniform'
-classifier = fitcdiscr(features, trainLabels,'Prior', 'uniform', 'discrimtype', 'linear');
-label_prediction_linear = predict(classifier, features);
-[class_error_linear_uniformprior, classification_error_linear_uniformprior] = ...
-    classification_errors(trainLabels, label_prediction_linear);
-
-%linear 'Prior' 'empirical' (default)
-classifier = fitcdiscr(features, trainLabels,'Prior', 'empirical', 'discrimtype', 'linear');
-label_prediction_linear = predict(classifier, features);
-[class_error_linear_empiricalprior, classification_error_linear_empiricalprior] = ...
-    classification_errors(trainLabels, label_prediction_linear);
-
-%% Training and testing error
-
-% data splitting
-
+%We apply random permutations to our data
+%It is needed because the labels are ordered: samples from correct movement
+%are followed by erroneous movements.
 n = length(trainLabels);
 permutations = randperm(n);
 data_rand = features(permutations,:);
 labels_rand = trainLabels(permutations);
+
+%We split the data into two sets with the same size
 set1 = data_rand(1:ceil(n/2),:);
 labels_set1 = labels_rand(1:ceil(n/2));
 set2 = data_rand(ceil(n/2)+1:end,:);
 labels_set2 = labels_rand(ceil(n/2)+1:end);
-
-% diaglinear
-classifier = fitcdiscr(set1, labels_set1, 'discrimtype', 'diaglinear');
-
-label_prediction_diaglinear_set2 = predict(classifier, set2);
-[class_error_diaglinear_set1, classification_error_diaglinear_set1] = ...
-    classification_errors(labels_set1, label_prediction_diaglinear_set1)
-
-label_prediction_diaglinear_set2 = predict(classifier, set2);
-[class_error_diaglinear_set2, classification_error_diaglinear_set2] = ...
-    classification_errors(labels_set2, label_prediction_diaglinear_set2)
-
-%% Kaggle submission
-
-classifier = fitcdiscr(trainData, trainLabels, 'discrimtype', 'linear');
-label_prediction = predict(classifier, testData);
-labelToCSV(label_prediction, 'test_labels_linear.csv', 'csv')

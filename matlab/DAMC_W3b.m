@@ -13,6 +13,8 @@ load('testSet.mat');
 outer_folds = 10;
 inner_folds = 5;
 
+N_sel = 100;
+
 outer_cvpartition = cvpartition(trainLabels,'kfold',outer_folds);
 
 for i = 1:outer_folds
@@ -35,19 +37,19 @@ for i = 1:outer_folds
 
         [orderedInd, orderedPower] = rankfeat(inner_train_data, inner_train_labels, 'fisher');
             
-        for N_sel = 1:10
-            train_data_sel = inner_train_data(:,orderedInd(1:N_sel));
-            val_data_sel = inner_val_data(:,orderedInd(1:N_sel));
+        for k = 1:N_sel
+            train_data_sel = inner_train_data(:,orderedInd(1:k));
+            test_data_sel = inner_val_data(:,orderedInd(1:k));
             classifier = fitcdiscr(train_data_sel, inner_train_labels, 'discrimtype', 'diaglinear');
 
             label_prediction = predict(classifier, train_data_sel);
-            label_prediction_val = predict(classifier, val_data_sel);
+            label_prediction_te = predict(classifier, test_data_sel);
 
-            classification_error = classification_errors(inner_train_labels, label_prediction);
-            classification_error_val = classification_errors(inner_val_labels, label_prediction_val);
+            class_error = classification_errors(inner_train_labels, label_prediction);
+            class_error_te = classification_errors(inner_val_labels, label_prediction_te);
 
-            error(j,N_sel) = classification_error;
-            error_val(j,N_sel) = classification_error_val;
+            error(j,k) = class_error;
+            error_val(j,k) = class_error_te;
         end
     end
     %trouver le N optimal
@@ -55,6 +57,10 @@ for i = 1:outer_folds
     mean_error_val(i,:) = mean(error_val,1);
     [value_error, best_N_features] = min(mean_error_val(i,:));
     serie_best_N_features(i) = best_N_features;
+    
+    % boxplot
+    optimal_training_error(i) = mean_error(i,best_N_features);
+    optimal_val_error(i) = mean_error_val(i,best_N_features);
     
     %tester notre model final
     [orderedInd_out, orderedPower_out] = rankfeat(outer_train_data, outer_train_labels, 'fisher');
@@ -66,23 +72,24 @@ for i = 1:outer_folds
     best_label_prediction = predict(best_classifier, best_train_data);
     best_label_prediction_te = predict(best_classifier, best_test_data);
 
-    [class_error, classification_error] = classification_errors(outer_train_labels, best_label_prediction);
-    [class_error_te, classification_error_te] = classification_errors(outer_test_labels, best_label_prediction_te);
+    class_error = classification_errors(outer_train_labels, best_label_prediction);
+    class_error_te = classification_errors(outer_test_labels, best_label_prediction_te);
     
-    final_error(i) = classification_error;
-    final_error_te(i) = classification_error_te;
+    final_error(i) = class_error;
+    final_error_te(i) = class_error_te;
 end
 
 %%
-[orderedInd, orderedPower] = rankfeat(inner_train_data, inner_train_labels, 'fisher');
-train_data_classif = trainData(:,orderedInd(1:75));
-classif = fitcdiscr(train_data_classif, trainLabels, 'discrimtype', 'linear');
-test_data_classif = testData(:,orderedInd(1:75));
-label_prediction = predict(classif, test_data_classif);
-labelToCSV(label_prediction, 'test_labels_linear_nested.csv', 'csv')
+% [orderedInd, orderedPower] = rankfeat(inner_train_data, inner_train_labels, 'fisher');
+% train_data_classif = trainData(:,orderedInd(1:75));
+% classif = fitcdiscr(train_data_classif, trainLabels, 'discrimtype', 'linear');
+% test_data_classif = testData(:,orderedInd(1:75));
+% label_prediction = predict(classif, test_data_classif);
+% labelToCSV(label_prediction, 'test_labels_linear_nested.csv', 'csv')
 
 %%
-subplot(2,2,1), boxplot(mean_error')
-subplot(2,2,2), boxplot(mean_error_val')
-subplot(2,2,3), boxplot(final_error)
-subplot(2,2,4), boxplot(final_error_te)
+
+boxplot_mat = [optimal_training_error', optimal_val_error', final_error_te'];
+
+figure
+boxplot(boxplot_mat)
