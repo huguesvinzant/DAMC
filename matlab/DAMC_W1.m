@@ -27,7 +27,7 @@ histogram(trainData(error_indices(:),feature1),...
     'BinWidth',0.05,'Normalization','probability');
 xlabel('Value'), ylabel('Proportion')
 legend('Correct','Error'), 
-title('Feature with similar repartition among classes')
+title('Feature with similar distribution among classes')
 subplot(1,2,2),
 histogram(trainData(correct_indices(:),feature2),...
     'BinWidth',0.05,'Normalization','probability');
@@ -36,7 +36,7 @@ histogram(trainData(error_indices(:),feature2),...
     'BinWidth',0.05,'Normalization','probability');
 xlabel('Value'), ylabel('Proportion')
 legend('Correct','Error'), 
-title('Feature with different repartition among classes')
+title('Feature with different distribution among classes')
 
 %% Boxplots
 
@@ -44,39 +44,46 @@ feature1_all = [trainData(correct_indices,feature1)
     trainData(error_indices,feature1)];
 feature2_all = [trainData(correct_indices,feature2)
     trainData(error_indices,feature2)];
-group = [zeros(1,length(correct_indices)),ones(1,length(error_indices))];
+group = [zeros(1,length(correct_indices)),ones(1,length(error_indices))]; 
 
 figure(2)
 subplot(2,2,1), 
 boxplot(feature1_all,group,'Labels',{'Correct','Error'})
-title('Boxplot feature 1')
+title('Boxplot feature 1 (similar)')
 subplot(2,2,2), 
 boxplot(feature2_all,group,'Labels',{'Correct','Error'})
-title('Boxplot feature 2')
+title('Boxplot feature 2 (different)')
 % We can see that the boxplot for similar features is more compact than the
 % one for different features
 subplot(2,2,3), 
 boxplot(feature1_all,group,'Notch','on','Labels',{'Correct','Error'})
-title('Notched Boxplot feature 1')
+title('Notched Boxplot feature 1 (similar)')
 subplot(2,2,4), 
 boxplot(feature2_all,group,'Notch','on','Labels',{'Correct','Error'})
-title('Notched Boxplot feature 2')
-%The Notch displays the 95% confidence interval around the median
+title('Notched Boxplot feature 2 (different)')
+%The 'Notch' option displays the 95% confidence interval around the median.
+%The notches do not overlap in the case of feature 2 (different), meaning
+%that at a 95% confidence interval the true means do differ. This is not
+%the case for feature 1 (similar).
 
 %% t-test
 
 [descision1,p_value1] = ttest2(trainData(correct_indices,feature1),...
     trainData(error_indices,feature1));
 % descision = 0 --> We do not reject the null hypothesis (at 5%)
-% high p-value --> no signignificant difference in the mean values
+% high p-value = 0.85 --> no significant difference between the mean values
 
 [descision2,p_value2] = ttest2(trainData(correct_indices,feature2),...
     trainData(error_indices,feature2));
 % descision = 1 --> We do reject the null hypothesis (at 5%)
-% low p-value --> signignificant difference in the mean values
+% low p-value = 1.20 * 10^-11 --> significant difference between the mean
+% values
 
 % We cannot use the t test for all the features beacause it only allows us
 % to compare them 2 by 2
+
+%t-test is only valid if the samples come from normal distributions with
+%equal covariances --> assumption may not be true for all features
 
 %% Feature thresholding
 
@@ -84,8 +91,10 @@ title('Notched Boxplot feature 2')
 
 figure(3)
 plot(trainData(correct_indices,feature1),trainData(correct_indices,feature2),'gx')
+title('Feature 2 in function of Feature 1 for both classes')
 hold on,
 plot(trainData(error_indices,feature1),trainData(error_indices,feature2),'rx')
+legend('Class 1 = CORRECT','Class 2 = ERROR')
 % feature thresholding is only useful for 1 feature at a time
 
 %% 2 Feature thresholding 
@@ -106,6 +115,8 @@ for i = 1:length(threshold_f2)
     title(strcat(num2str(threshold_f2(i)), ' threshold for feature 2'))
 end
 
+%0.6 seems to be the most promising threshold of the two classes for
+%feature 2 (different)
 
 %% Errors calculation
 
@@ -122,6 +133,7 @@ figure(5)
 plot(threshold_f2, classif_err_f2, threshold_f2, class_err_f2);
 legend('Classification error','Class eror')
 xlabel('Threshold'), ylabel('Error')
+title('Classification error in terms of the threshold value for feature 2')
 
 %% Classification using thresholding
 
