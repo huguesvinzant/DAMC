@@ -65,8 +65,7 @@ for i = 1:outer_folds
         inner_test_data = outer_train_data(inner_indices == 1,:);
         inner_test_labels = outer_train_labels(inner_indices == 1);
         
-        [inner_coeff, inner_score, ~, ~, explained_var, mu] = pca(inner_train_data);
-        inner_PCA_data = inner_train_data * inner_coeff;
+        [inner_coeff, inner_PCA_data, ~, ~, explained_var, mu] = pca(inner_train_data);
         inner_PCA_data_te = (inner_test_data - mu) * inner_coeff;
 
         %tot_inner_variance(j,:) = cumsum(explained_var(1:200));
@@ -94,8 +93,7 @@ for i = 1:outer_folds
     [outer_train_data, mu, sigma] = zscore(outer_train_data, 0, 1);
     outer_test_data = (outer_test_data - mu)./sigma;
 
-    [outer_coeff, ~, ~, ~, ~, mu] = pca(outer_train_data);
-    outer_PCA_data = outer_train_data * outer_coeff;
+    [outer_coeff, outer_PCA_data, ~, ~, ~, mu] = pca(outer_train_data);
     outer_PCA_data_te = (outer_test_data - mu) * outer_coeff;
     
     outer_train_data_sel = outer_PCA_data(:,1:best_N(i));

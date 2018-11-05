@@ -40,7 +40,7 @@ for i = 1:outer_folds
         for k = 1:N_sel
             train_data_sel = inner_train_data(:,orderedInd(1:k));
             test_data_sel = inner_val_data(:,orderedInd(1:k));
-            classifier = fitcdiscr(train_data_sel, inner_train_labels, 'discrimtype', 'diagquadratic');
+            classifier = fitcdiscr(train_data_sel, inner_train_labels, 'discrimtype', 'diaglinear');
 
             label_prediction = predict(classifier, train_data_sel);
             label_prediction_te = predict(classifier, test_data_sel);
@@ -67,7 +67,7 @@ for i = 1:outer_folds
     best_train_data = outer_train_data(:,orderedInd_out(1:best_N_features));
     best_test_data = outer_test_data(:,orderedInd_out(1:best_N_features));
             
-    best_classifier = fitcdiscr(best_train_data, outer_train_labels, 'discrimtype', 'diagquadratic');
+    best_classifier = fitcdiscr(best_train_data, outer_train_labels, 'discrimtype', 'diaglinear');
 
     best_label_prediction = predict(best_classifier, best_train_data);
     best_label_prediction_te = predict(best_classifier, best_test_data);
@@ -88,9 +88,6 @@ end
 % labelToCSV(label_prediction, 'test_labels_linear_nested.csv', 'csv')
 
 %%
-% subplot(1,3,1), boxplot(optimal_training_error', optimal_val_error', final_error_te)
-% subplot(1,3,2), boxplot(optimal_val_error')
-% subplot(1,3,3), boxplot(final_error_te)
 
 boxplot_mat = [optimal_training_error', optimal_val_error', final_error_te'];
 
