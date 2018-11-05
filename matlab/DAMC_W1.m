@@ -11,28 +11,33 @@ load('testSet.mat');
 %% Statistical significance
 
 %% Histograms
-correct_indices = find(trainLabels == 0);
-error_indices = find(trainLabels == 1);
+
+% The label "0" corresponds to "erroneous movement".
+% The label "1" to "correct movement".
+erroneous_movement = find(trainLabels == 0);
+correct_movement = find(trainLabels == 1);
 
 % Useful features 650-800
-feature1 = 665; % similar distribution
-feature2 = 710; % different distribution
+% Feature with similar distribution between the two classes
+feature_same_distrib = 665; %was called feature1 before
+% Feature with different distribution between the two classes
+feature_diff_distrib = 710; %was called feature2 before
 
 figure(1)
 subplot(1,2,1),
-histogram(trainData(correct_indices(:),feature1),...
+histogram(trainData(erroneous_movement(:),feature_same_distrib),...
     'BinWidth',0.05,'Normalization','probability');
 hold on
-histogram(trainData(error_indices(:),feature1),...
+histogram(trainData(correct_movement(:),feature_same_distrib),...
     'BinWidth',0.05,'Normalization','probability');
 xlabel('Value'), ylabel('Proportion')
 legend('Correct','Error'), 
 title('Feature with similar distribution among classes')
 subplot(1,2,2),
-histogram(trainData(correct_indices(:),feature2),...
+histogram(trainData(erroneous_movement(:),feature_diff_distrib),...
     'BinWidth',0.05,'Normalization','probability');
 hold on
-histogram(trainData(error_indices(:),feature2),...
+histogram(trainData(correct_movement(:),feature_diff_distrib),...
     'BinWidth',0.05,'Normalization','probability');
 xlabel('Value'), ylabel('Proportion')
 legend('Correct','Error'), 
@@ -40,11 +45,11 @@ title('Feature with different distribution among classes')
 
 %% Boxplots
 
-feature1_all = [trainData(correct_indices,feature1)
-    trainData(error_indices,feature1)];
-feature2_all = [trainData(correct_indices,feature2)
-    trainData(error_indices,feature2)];
-group = [zeros(1,length(correct_indices)),ones(1,length(error_indices))]; 
+feature1_all = [trainData(erroneous_movement,feature_same_distrib)
+    trainData(correct_movement,feature_same_distrib)];
+feature2_all = [trainData(erroneous_movement,feature_diff_distrib)
+    trainData(correct_movement,feature_diff_distrib)];
+group = [zeros(1,length(erroneous_movement)),ones(1,length(correct_movement))]; 
 
 figure(2)
 subplot(2,2,1), 
@@ -68,13 +73,13 @@ title('Notched Boxplot feature 2 (different)')
 
 %% t-test
 
-[descision1,p_value1] = ttest2(trainData(correct_indices,feature1),...
-    trainData(error_indices,feature1));
+[descision1,p_value1] = ttest2(trainData(erroneous_movement,feature_same_distrib),...
+    trainData(correct_movement,feature_same_distrib));
 % descision = 0 --> We do not reject the null hypothesis (at 5%)
 % high p-value = 0.85 --> no significant difference between the mean values
 
-[descision2,p_value2] = ttest2(trainData(correct_indices,feature2),...
-    trainData(error_indices,feature2));
+[descision2,p_value2] = ttest2(trainData(erroneous_movement,feature_diff_distrib),...
+    trainData(correct_movement,feature_diff_distrib));
 % descision = 1 --> We do reject the null hypothesis (at 5%)
 % low p-value = 1.20 * 10^-11 --> significant difference between the mean
 % values
@@ -90,10 +95,10 @@ title('Notched Boxplot feature 2 (different)')
 %% Plot features
 
 figure(3)
-plot(trainData(correct_indices,feature1),trainData(correct_indices,feature2),'gx')
+plot(trainData(erroneous_movement,feature_same_distrib),trainData(erroneous_movement,feature_diff_distrib),'gx')
 title('Feature 2 in function of Feature 1 for both classes')
 hold on,
-plot(trainData(error_indices,feature1),trainData(error_indices,feature2),'rx')
+plot(trainData(correct_movement,feature_same_distrib),trainData(correct_movement,feature_diff_distrib),'rx')
 legend('Class 1 = CORRECT','Class 2 = ERROR')
 % feature thresholding is only useful for 1 feature at a time
 
@@ -106,9 +111,9 @@ threshold_f2 = 0:0.2:1;
 
 figure(4); 
 for i = 1:length(threshold_f2)
-    subplot(2,3,i), histogram(trainData(correct_indices,feature2), 30,...
+    subplot(2,3,i), histogram(trainData(erroneous_movement,feature_diff_distrib), 30,...
         'Normalization', 'probability'),
-    hold on, histogram(trainData(error_indices,feature2), 30,...
+    hold on, histogram(trainData(correct_movement,feature_diff_distrib), 30,...
         'Normalization', 'probability'),
     line([threshold_f2(i), threshold_f2(i)], ylim, 'LineWidth', 1, 'Color', 'g'),
     xlabel('Value'), ylabel('Proportion'),
@@ -123,7 +128,7 @@ end
 threshold_f2 = 0:0.05:1;
 
 for threshold = 1:length(threshold_f2)
-    class_f2 = (trainData(:,feature2)>threshold_f2(threshold));
+    class_f2 = (trainData(:,feature_diff_distrib)>threshold_f2(threshold));
     [class_error, classification_error] = classification_errors(trainLabels, class_f2);
     class_err_f2(threshold) = class_error;
     classif_err_f2(threshold) = classification_error;
@@ -137,8 +142,8 @@ title('Classification error in terms of the threshold value for feature 2')
 
 %% Classification using thresholding
 
-train_labels = (trainData(:,feature2)<0); % 1 is true % 0 is false
-test_labels = (testData(:,feature2)<0);
+train_labels = (trainData(:,feature_diff_distrib)<0); % 1 is true % 0 is false
+test_labels = (testData(:,feature_diff_distrib)<0);
 
 labelToCSV(test_labels, 'test_labels_threshold.csv', 'csv')
 
