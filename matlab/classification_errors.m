@@ -1,4 +1,6 @@
 function class_error = classification_errors(correct_labels, predicted_labels)
+%On devrait lui changer son nom vu qu'elle nous retourne class error et non
+%classification error !!! %MP
 
 correct_indices = find(correct_labels == 0);
 error_indices = find(correct_labels == 1);
