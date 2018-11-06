@@ -102,4 +102,4 @@ label_prediction_final = predict(classifier_final, test_final);
 
 %% Submission
 
-labelToCSV(label_prediction_final, 'test_labels_Final_model_Marion.csv', 'csv')
+labelToCSV(label_prediction_final, 'test_labels_final_model_marion.csv', '../csv')
