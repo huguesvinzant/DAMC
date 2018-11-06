@@ -15,14 +15,16 @@ features = trainData(:,1:100:end);
 %linear
 classifier = fitcdiscr(features, trainLabels, 'discrimtype', 'linear');
 label_prediction_linear = predict(classifier, features);
-[class_error_linear, classification_error_linear] = ...
-    classification_errors(trainLabels, label_prediction_linear);
+class_error_linear = class_error(trainLabels, label_prediction_linear);
+classification_error_linear = ...
+    classification_error(trainLabels, label_prediction_linear);
 
 %diaglinear
 classifier = fitcdiscr(features, trainLabels, 'discrimtype', 'diaglinear');
 label_prediction_diaglinear = predict(classifier, features);
-[class_error_diaglinear, classification_error_diaglinear] = ...
-    classification_errors(trainLabels, label_prediction_diaglinear);
+class_error_diaglinear = class_error(trainLabels, label_prediction_diaglinear);
+classification_error_diaglinear = ...
+    classification_error(trainLabels, label_prediction_diaglinear);
 
 %quadratic -> cannot be computed because one or more classes have 
 %singular covariance matrices.
@@ -30,24 +32,31 @@ label_prediction_diaglinear = predict(classifier, features);
 %diagquadratic
 classifier = fitcdiscr(features, trainLabels, 'discrimtype', 'diagquadratic');
 label_prediction_diagquadratic = predict(classifier, features);
-[class_error_diagquadratic, classification_error_diagquadratic] = ...
-    classification_errors(trainLabels, label_prediction_diagquadratic);
+class_error_diagquadratic = class_error(trainLabels, label_prediction_diagquadratic);
+classification_error_diagquadratic = ...
+    classification_error(trainLabels, label_prediction_diagquadratic);
 
 % with different Prior
 
 %linear 'Prior' 'uniform'
 classifier = fitcdiscr(features, trainLabels,'Prior', 'uniform', 'discrimtype', 'linear');
 label_prediction_linear = predict(classifier, features);
-[class_error_linear_uniformprior, classification_error_linear_uniformprior] = ...
-    classification_errors(trainLabels, label_prediction_linear);
+class_error_linear_uniformprior = ...
+    class_error(trainLabels, label_prediction_linear);
+classification_error_linear_uniformprior = ...
+    classification_error(trainLabels, label_prediction_linear);
 
 %linear 'Prior' 'empirical' (default)
 classifier = fitcdiscr(features, trainLabels,'Prior', 'empirical', 'discrimtype', 'linear');
 label_prediction_linear = predict(classifier, features);
-[class_error_linear_empiricalprior, classification_error_linear_empiricalprior] = ...
-    classification_errors(trainLabels, label_prediction_linear);
+class_error_linear_empiricalprior = ...
+    class_error(trainLabels, label_prediction_linear);
+classification_error_linear_empiricalprior = ...
+    classification_error(trainLabels, label_prediction_linear);
 
 %% Training and testing error
+
+features = trainData(:,1:100:end);
 
 % data splitting
 
@@ -61,15 +70,69 @@ set2 = data_rand(ceil(n/2)+1:end,:);
 labels_set2 = labels_rand(ceil(n/2)+1:end);
 
 % diaglinear
-classifier = fitcdiscr(set1, labels_set1, 'discrimtype', 'diaglinear');
+classifier_diaglinear = fitcdiscr(set1, labels_set1, 'discrimtype', 'diaglinear');
 
-label_prediction_diaglinear_set2 = predict(classifier, set2);
-[class_error_diaglinear_set1, classification_error_diaglinear_set1] = ...
-    classification_errors(labels_set1, label_prediction_diaglinear_set1)
+label_prediction_diaglinear_set1 = predict(classifier_diaglinear, set1);
+class_error_diaglinear_set1 = ...
+    class_error(labels_set1, label_prediction_diaglinear_set1);
+classification_error_diaglinear_set1 = ...
+    classification_error(labels_set1, label_prediction_diaglinear_set1);
 
-label_prediction_diaglinear_set2 = predict(classifier, set2);
-[class_error_diaglinear_set2, classification_error_diaglinear_set2] = ...
-    classification_errors(labels_set2, label_prediction_diaglinear_set2)
+label_prediction_diaglinear_set2 = predict(classifier_diaglinear, set2);
+class_error_diaglinear_set2 = ...
+    class_error(labels_set2, label_prediction_diaglinear_set2);
+classification_error_diaglinear_set2 = ...
+    classification_error(labels_set2, label_prediction_diaglinear_set2);
+
+% linear
+classifier_linear = fitcdiscr(set1, labels_set1, 'discrimtype', 'linear');
+
+label_prediction_linear_set1 = predict(classifier_linear, set1);
+class_error_linear_set1 = ...
+    class_error(labels_set1, label_prediction_linear_set1);
+classification_error_linear_set1 = ...
+    classification_error(labels_set1, label_prediction_linear_set1);
+
+label_prediction_linear_set2 = predict(classifier_linear, set2);
+class_error_linear_set2 = ...
+    class_error(labels_set2, label_prediction_linear_set2);
+classification_error_linear_set2 = ...
+    classification_error(labels_set2, label_prediction_linear_set2);
+
+% diagquadratic
+classifier_diagquadratic = fitcdiscr(set1, labels_set1, 'discrimtype', 'diagquadratic');
+
+label_prediction_diagquadratic_set1 = predict(classifier_diagquadratic, set1);
+class_error_diagquadratic_set1 = ...
+    class_error(labels_set1, label_prediction_diagquadratic_set1);
+classification_error_diagquadratic_set1 = ...
+    classification_error(labels_set1, label_prediction_diagquadratic_set1);
+
+label_prediction_diagquadratic_set2 = predict(classifier_diagquadratic, set2);
+class_error_diagquadratic_set2 = ...
+    class_error(labels_set2, label_prediction_diagquadratic_set2);
+classification_error_diagquadratic_set2 = ...
+    classification_error(labels_set2, label_prediction_diagquadratic_set2);
+
+% quadratic
+classifier_quadratic = fitcdiscr(set1, labels_set1,'discrimtype', 'quadratic');
+
+label_prediction_quadratic_set1 = predict(classifier_quadratic, set1);
+class_error_quadratic_set1 = ...
+    class_error(labels_set1, label_prediction_quadratic_set1);
+classification_error_quadratic_set1 = ...
+    classification_error(labels_set1, label_prediction_quadratic_set1);
+
+label_prediction_quadratic_set2 = predict(classifier_quadratic, set2);
+class_error_quadratic_set2 = ...
+    class_error(labels_set2, label_prediction_quadratic_set2);
+classification_error_quadratic_set2 = ...
+    classification_error(labels_set2, label_prediction_quadratic_set2);
+
+%Testing with the prior as 'uniform', we will get a decrease in the class
+%error and an increase in the classification error for all the models.
+
+%Best model is Diagquadratic
 
 %% Kaggle submission
 
@@ -96,7 +159,8 @@ for i = 1:k
     classifier = fitcdiscr(train_data, train_labels, 'discrimtype', 'linear');
     label_prediction = predict(classifier, test_data);
 
-    [class_error, classification_error] = classification_errors(test_labels, label_prediction);
+    class_error = class_error(test_labels, label_prediction);
+    classification_error = classification_error(test_labels, label_prediction);
     error(i) = classification_error;
 end
 
