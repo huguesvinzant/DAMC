@@ -17,8 +17,8 @@ PCA_data_te = (testData - mu) * coeff;
 
 %% CV for hyperparameters optimization
 
-k = 5;
-N_sel = 596;
+k = 2;
+N_sel = 200;
 Classifiers = {'linear', 'diaglinear', 'diagQuadratic'};
 
 cvpartition_ = cvpartition(trainLabels,'kfold',k);
@@ -101,4 +101,4 @@ label_prediction_final = predict(classifier_final, test_final);
 
 %% Submission
 
-labelToCSV(label_prediction_final, 'test_labels_final_model_marion.csv', '../csv')
+labelToCSV(label_prediction_final, 'test_labels_final_model.csv', '../csv')
