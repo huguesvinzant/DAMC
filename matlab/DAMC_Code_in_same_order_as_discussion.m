@@ -1,8 +1,7 @@
-%Project DAMC
-%Group n° ????
-%Mitchell Camille
-%Perier Marion
-%Vinzant Hugues
+% EE-516 - Data Analysis and Model Classification, EPFL (2018)
+% Project 1
+% Group 15
+% Mitchell Camille, Perier Marion, Vinzant Hugues
 
 %% Clear variables
 clear variables
@@ -38,8 +37,8 @@ hold on
 histogram(trainData(erroneous_movement(:),feature_same_distrib),...
     'BinWidth',0.05,'Normalization','probability');
 xlabel('Value'), ylabel('Proportion')
-legend('Correct movement','Erroneous movement'),
-title('Feature with similar distribution among classes')
+legend({'Correct movement','Erroneous movement'}, 'FontSize', 10),
+title('Feature with similar distribution among classes', 'FontSize', 20)
 subplot(1,2,2),
 histogram(trainData(correct_movement(:),feature_diff_distrib),...
     'BinWidth',0.05,'Normalization','probability');
@@ -47,8 +46,8 @@ hold on
 histogram(trainData(erroneous_movement(:),feature_diff_distrib),...
     'BinWidth',0.05,'Normalization','probability');
 xlabel('Value'), ylabel('Proportion')
-legend('Correct movement','Erroneous movement'), 
-title('Feature with different distribution among classes')
+legend({'Correct movement','Erroneous movement'}, 'FontSize', 10), 
+title('Feature with different distribution among classes', 'FontSize', 20)
 
 %% Boxplots
 
@@ -59,18 +58,10 @@ feature_diff_distrib_all = [trainData(correct_movement,feature_diff_distrib)
 group = [zeros(1,length(correct_movement)),ones(1,length(erroneous_movement))]; 
 
 figure(2)
-subplot(2,2,1), 
-boxplot(feature_same_distrib_all,group,'Labels',{'Correct movement','Erroneous movement'})
-title('Boxplot for the feature with similar distribution among classes')
-subplot(2,2,2), 
-boxplot(feature_diff_distrib_all,group,'Labels',{'Correct movement','Erroneous movement'})
-title('Boxplot for the feature with different distribution among classes')
-% We can see that the boxplot for similar features is more compact than the
-% one for different features
-subplot(2,2,3), 
+subplot(1,2,1), 
 boxplot(feature_same_distrib_all,group,'Notch','on','Labels',{'Correct movement','Erroneous movement'})
 title('Notched Boxplot for the feature with similar distribution among classes')
-subplot(2,2,4), 
+subplot(1,2,2), 
 boxplot(feature_diff_distrib_all,group,'Notch','on','Labels',{'Correct','Error'})
 title('Notched Boxplot for the feature with different distribution among classes')
 %The 'Notch' option displays the 95% confidence interval around the median.
