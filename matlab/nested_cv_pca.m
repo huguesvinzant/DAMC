@@ -1,4 +1,4 @@
-function class_error_test = nested_cv_pca(trainData, trainLabels, outer_folds, inner_folds)
+function class_error_test = nested_cv_pca(trainData, trainLabels, outer_folds, inner_folds, classifier)
 
     outer_cvpartition = cvpartition(trainLabels,'kfold',outer_folds);
 
@@ -30,7 +30,7 @@ function class_error_test = nested_cv_pca(trainData, trainLabels, outer_folds, i
                 train_data_sel = inner_PCA_data(:,1:N_sel);
                 val_data_sel = inner_PCA_data_te(:,1:N_sel);
 
-                inner_classifier = fitcdiscr(train_data_sel, inner_train_labels, 'discrimtype', 'linear');
+                inner_classifier = fitcdiscr(train_data_sel, inner_train_labels, 'discrimtype', classifier);
                 inner_label_prediction_val = predict(inner_classifier, val_data_sel);
 
                 class_error_val = class_error(inner_test_labels, inner_label_prediction_val);

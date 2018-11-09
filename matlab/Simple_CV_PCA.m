@@ -23,7 +23,7 @@ Best_var_fold = mean_explained_var_fold(best_Ns(best_class_idx));
 
 outer_folds = 5;
 inner_folds = 4;
-class_error_test = nested_cv_pca(trainData, trainLabels, outer_folds, inner_folds);
+class_error_test = nested_cv_pca(trainData, trainLabels, outer_folds, inner_folds, Best_classifier);
 
 % t-test
 [h, p] = ttest(class_error_test, 0.5);

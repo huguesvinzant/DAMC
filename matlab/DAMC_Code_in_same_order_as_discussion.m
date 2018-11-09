@@ -83,7 +83,7 @@ histogram(trainData(correct_movement,feature_diff_distrib), 20),
 hold on, 
 histogram(trainData(erroneous_movement,feature_diff_distrib), 20),
 line([threshold_f2, threshold_f2], ylim, 'LineWidth', 1, 'Color', 'g'),
-xlabel('Threshold value'), ylabel('Proportion'),
+xlabel('Threshold value at 0.5'), ylabel('Proportion'),
 legend({'Correct movement','Erroneous movement'}),
 title('Optimal threshold for feature 2, nomalized distributions', 'FontSize', 15);
 subplot(1,2,1),
@@ -93,7 +93,7 @@ hold on,
 histogram(trainData(erroneous_movement,feature_diff_distrib), 20,....
     'Normalization','probability'),
 line([threshold_f2, threshold_f2], ylim, 'LineWidth', 1, 'Color', 'g'),
-xlabel('Threshold value'), ylabel('Proportion'),
+xlabel('Threshold value at 0.5'), ylabel('Proportion'),
 legend({'Correct movement','Erroneous movement'}),
 title('Optimal threshold for feature 2, real distributions', 'FontSize', 15);
 
