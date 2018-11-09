@@ -8,9 +8,13 @@ function [min_errors, best_Ns, mean_explained_var_fold] = cv_pca(trainData, trai
         train_data = trainData(features == 0,:);
         test_data = trainData(features == 1,:);
         test_labels = trainLabels(features == 1);
+        
+        [std_train_data, mu, sigma] = zscore(train_data);
+        std_test_data = (test_data - mu)./sigma;
 
-        [coeff, PCA_data, ~, ~, exp_var, mu_fold] = pca(train_data);
-        PCA_data_te = (test_data - mu_fold) * coeff;
+        [coeff, ~, ~, ~, exp_var] = pca(std_train_data);
+        PCA_data = std_train_data * coeff;
+        PCA_data_te = std_test_data * coeff;
 
         explained_var_fold(i, 1:length(exp_var)) = cumsum(exp_var);
 
@@ -20,7 +24,8 @@ function [min_errors, best_Ns, mean_explained_var_fold] = cv_pca(trainData, trai
                 train_data_sel = PCA_data(:,1:N_features);
                 test_data_sel = PCA_data_te(:,1:N_features);
 
-                classifier = fitcdiscr(train_data_sel, train_labels, 'discrimtype', Classifiers{m});
+                classifier = fitcdiscr(train_data_sel, train_labels, ...
+                    'Prior', 'uniform', 'discrimtype', Classifiers{m});
                 label_prediction = predict(classifier, train_data_sel);
                 label_prediction_te = predict(classifier, test_data_sel);
 
@@ -53,6 +58,19 @@ function [min_errors, best_Ns, mean_explained_var_fold] = cv_pca(trainData, trai
     [min_errors(1), best_Ns(1)] = min(mean(linear_error_te, 1));
     [min_errors(2), best_Ns(2)] = min(mean(diaglinear_error_te, 1));
     [min_errors(3), best_Ns(3)] = min(mean(diagquadratic_error_te, 1));
+    
+    figure
+    plot(mean(linear_error_te, 1), 'm')
+    hold on
+    plot(mean(diaglinear_error_te, 1), 'c')
+    plot(mean(diagquadratic_error_te, 1), 'g')
+    plot(best_Ns(1), min_errors(1), 'mx')
+    plot(best_Ns(2), min_errors(2), 'cx')
+    plot(best_Ns(3), min_errors(3), 'gx')
+    xlabel('# features'), ylabel('Class error')
+    title('Test error in function of the classifier')
+    legend('Linear', 'Diag-linear', 'Diag-quadratic')
+    
     
     figure
     subplot(3,1,1), plot(mean(linear_error, 1)), hold on, plot(mean(linear_error_te, 1)),

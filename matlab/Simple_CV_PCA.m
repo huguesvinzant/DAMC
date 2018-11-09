@@ -11,7 +11,7 @@ load('testSet.mat');
 %% simple CV PCA
 
 k = 4;
-Classifiers = {'linear', 'diaglinear', 'diagQuadratic'};
+Classifiers = {'linear', 'diaglinear', 'diagquadratic'};
 
 [min_errors, best_Ns, mean_explained_var_fold] = cv_pca(trainData, trainLabels, k, Classifiers);
 

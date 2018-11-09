@@ -13,8 +13,6 @@ load('testSet.mat');
 [coeff, PCA_data,  ~, ~, explained_var, mu] = pca(trainData);
 PCA_data_te = (testData - mu) * coeff;
 
-%% Normalization ??
-
 %% CV for hyperparameters optimization
 
 k = 2;
