@@ -33,15 +33,15 @@ function [min_errors, best_Ns, mean_explained_var_fold] = cv_pca(trainData, trai
                 class_error_test = class_error(test_labels, label_prediction_te);
 
                 if m == 1
-                    linear_error(i,N_features) = class_error_;
+                    %linear_error(i,N_features) = class_error_;
                     linear_error_te(i,N_features) = class_error_test;
                 end
                 if m == 2
-                    diaglinear_error(i,N_features) = class_error_;
+                    %diaglinear_error(i,N_features) = class_error_;
                     diaglinear_error_te(i,N_features) = class_error_test;
                 end
                 if m == 3
-                    diagquadratic_error(i,N_features) = class_error_;
+                    %diagquadratic_error(i,N_features) = class_error_;
                     diagquadratic_error_te(i,N_features) = class_error_test;
                 end
             end
@@ -60,6 +60,7 @@ function [min_errors, best_Ns, mean_explained_var_fold] = cv_pca(trainData, trai
     [min_errors(3), best_Ns(3)] = min(mean(diagquadratic_error_te, 1));
     
     figure
+    subplot(1,2,1)
     plot(mean(linear_error_te, 1), 'Color', [0.2 0.47 0.7])
     hold on
     plot(mean(diaglinear_error_te, 1), 'Color', [0.86 0.43 0.08])
@@ -71,15 +72,17 @@ function [min_errors, best_Ns, mean_explained_var_fold] = cv_pca(trainData, trai
     title('Test error in function of the classifier')
     legend('Linear', 'Diag-linear', 'Diag-quadratic', ...
         'Linear minimum error', 'Diag-linear minimum error',...
-        'Diag-quadratic minimum error')
+        'Diag-quadratic minimum error', 'Location', 'best')
     
-    
-    figure
-    subplot(3,1,1), plot(mean(linear_error, 1)), hold on, plot(mean(linear_error_te, 1)),
-    xlabel('# features'), ylabel('Class error'), title('Linear classifier'), legend('Train error', 'Test error')
-    subplot(3,1,2), plot(mean(diaglinear_error, 1)), hold on, plot(mean(diaglinear_error_te, 1)),
-    xlabel('# features'), ylabel('Class error'), title('Diag-linear classifier'), legend('Train error', 'Test error')
-    subplot(3,1,3), plot(mean(diagquadratic_error, 1)), hold on, plot(mean(diagquadratic_error_te, 1)),
-    xlabel('# features'), ylabel('Class error'), title('Diag-quadratic classifier'), legend('Train error', 'Test error')
+    subplot(1,2,2)
+    plot(mean_explained_var_fold)
+    hold on
+    plot(best_Ns(1), mean_explained_var_fold(best_Ns(1)), '.', 'Color', [0.2 0.47 0.7], 'MarkerSize', 15)
+    plot(best_Ns(2), mean_explained_var_fold(best_Ns(2)), '.', 'Color', [0.86 0.43 0.08], 'MarkerSize', 15)
+    plot(best_Ns(3), mean_explained_var_fold(best_Ns(3)), '.', 'Color', [0.4 0.55 0.05], 'MarkerSize', 15)
+    xlabel('# features'), ylabel('Cumulative explained variance')
+    title('Optimal number of features depending on the classifier')
+    legend('cumulative explained variance', 'linear', 'Diag-linear',...
+        'Diag-quadratic', 'Location', 'best')
 
 end
