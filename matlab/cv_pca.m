@@ -64,9 +64,9 @@ function [min_errors, best_Ns, mean_explained_var_fold] = cv_pca(trainData, trai
     hold on
     plot(mean(diaglinear_error_te, 1), 'Color', [0.86 0.43 0.08])
     plot(mean(diagquadratic_error_te, 1), 'Color', [0.4 0.55 0.05])
-    plot(best_Ns(1), min_errors(1), '.', 'MakerSize', 10, 'Color', [0.2 0.47 0.7])
-    plot(best_Ns(2), min_errors(2), '.', 'MakerSize', 10, 'Color', [0.86 0.43 0.08])
-    plot(best_Ns(3), min_errors(3), '.', 'MakerSize', 10, 'Color', [0.4 0.55 0.05])
+    plot(best_Ns(1), min_errors(1), '.', 'Color', [0.2 0.47 0.7], 'MarkerSize', 15)
+    plot(best_Ns(2), min_errors(2), '.', 'Color', [0.86 0.43 0.08], 'MarkerSize', 15)
+    plot(best_Ns(3), min_errors(3), '.', 'Color', [0.4 0.55 0.05], 'MarkerSize', 15)
     xlabel('# features'), ylabel('Class error')
     title('Test error in function of the classifier')
     legend('Linear', 'Diag-linear', 'Diag-quadratic', ...

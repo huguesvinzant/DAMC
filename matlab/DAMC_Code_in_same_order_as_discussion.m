@@ -119,7 +119,7 @@ threshold_f2 = 0:0.05:1;
 
 for threshold = 1:length(threshold_f2)
     class_f2 = (trainData(:,feature_diff_distrib)>threshold_f2(threshold));
-    class_err_f2(threshold) = class_error(trainLabels, class_f2_);
+    class_err_f2(threshold) = class_error(trainLabels, class_f2);
     classif_err_f2(threshold) = classification_error(trainLabels, class_f2);
 end
 
@@ -137,7 +137,7 @@ title('Classification and class error in terms of the threshold value for featur
 %are followed by erroneous movements.
 n = length(trainLabels);
 permutations = randperm(n);
-data_rand = features(permutations,:);
+data_rand = trainData(permutations,:);
 labels_rand = trainLabels(permutations);
 
 %We split the data into two sets with the same size
@@ -145,3 +145,39 @@ set1 = data_rand(1:ceil(n/2),:);
 labels_set1 = labels_rand(1:ceil(n/2));
 set2 = data_rand(ceil(n/2)+1:end,:);
 labels_set2 = labels_rand(ceil(n/2)+1:end);
+
+% diaglinear
+classifier_diaglinear = fitcdiscr(set1, labels_set1, ...
+    'Prior', 'uniform', 'discrimtype', 'diaglinear');
+
+label_prediction_diaglinear_set1 = predict(classifier_diaglinear, set1);
+class_error_diaglinear_set1 = ...
+    class_error(labels_set1, label_prediction_diaglinear_set1);
+
+label_prediction_diaglinear_set2 = predict(classifier_diaglinear, set2);
+class_error_diaglinear_set2 = ...
+    class_error(labels_set2, label_prediction_diaglinear_set2);
+
+% linear
+classifier_linear = fitcdiscr(set1, labels_set1, ...
+    'Prior', 'uniform', 'discrimtype', 'linear');
+
+label_prediction_linear_set1 = predict(classifier_linear, set1);
+class_error_linear_set1 = ...
+    class_error(labels_set1, label_prediction_linear_set1);
+
+label_prediction_linear_set2 = predict(classifier_linear, set2);
+class_error_linear_set2 = ...
+    class_error(labels_set2, label_prediction_linear_set2);
+
+% diagquadratic
+classifier_diagquadratic = fitcdiscr(set1, labels_set1, ...
+    'Prior', 'uniform', 'discrimtype', 'diagquadratic');
+
+label_prediction_diagquadratic_set1 = predict(classifier_diagquadratic, set1);
+class_error_diagquadratic_set1 = ...
+    class_error(labels_set1, label_prediction_diagquadratic_set1);
+
+label_prediction_diagquadratic_set2 = predict(classifier_diagquadratic, set2);
+class_error_diagquadratic_set2 = ...
+    class_error(labels_set2, label_prediction_diagquadratic_set2);

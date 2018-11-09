@@ -30,21 +30,26 @@ class_error_test = nested_cv_pca(trainData, trainLabels, outer_folds, inner_fold
 
 %% Final model
 
-[coeff, PCA_data,  ~, ~, explained_var, mu] = pca(trainData);
-PCA_data_te = (testData - mu) * coeff;
+[std_train_data, mu, sigma] = zscore(trainData);
+std_test_data = (testData - mu)./sigma;
+
+[coeff, ~, ~, ~, explained_var] = pca(std_train_data);
+PCA_data = std_train_data * coeff;
+PCA_data_te = std_test_data * coeff;
 
 explained_var = cumsum(explained_var);
 features = find(explained_var < (Best_var_fold + 1e-2) & explained_var > (Best_var_fold - 1e-2));
 [diff, ind] = min(explained_var(features) - Best_var_fold);
 Best_N = features(ind);
 
-train_final = PCA_data(:,1:features(ind));
-test_final = PCA_data_te(:,1:features(ind));
+train_final = PCA_data(:,1:Best_N);
+test_final = PCA_data_te(:,1:Best_N);
 
-classifier_final = fitcdiscr(train_final, trainLabels, 'discrimtype', Best_classifier);
+classifier_final = fitcdiscr(train_final, trainLabels,...
+    'Prior', 'uniform', 'discrimtype', Best_classifier);
 
 label_prediction_final = predict(classifier_final, test_final);
 
 %% Submission
 
-labelToCSV(label_prediction_final, 'test_labels_PCA_model.csv', '../csv')
+labelToCSV(label_prediction_final, 'final_PCA_model.csv', '../csv')
