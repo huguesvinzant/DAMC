@@ -59,7 +59,7 @@ end
     plot(best_Ns(2), min_errors(2), '.', 'Color', [0.86 0.43 0.08], 'MarkerSize', 15)
     plot(best_Ns(3), min_errors(3), '.', 'Color', [0.4 0.55 0.05], 'MarkerSize', 15)
     xlabel('# features'), ylabel('Class error')
-    title('Test error in function of the classifier')
+    title('Test error in function of the classifier fisher optimization')
     legend('Linear', 'Diag-linear', 'Diag-quadratic', ...
         'Linear minimum error', 'Diag-linear minimum error',...
         'Diag-quadratic minimum error', 'Location', 'best')
@@ -70,8 +70,8 @@ end
     plot(best_Ns(1), exp_var(best_Ns(1)), '.', 'Color', [0.2 0.47 0.7], 'MarkerSize', 15)
     plot(best_Ns(2), exp_var(best_Ns(2)), '.', 'Color', [0.86 0.43 0.08], 'MarkerSize', 15)
     plot(best_Ns(3), exp_var(best_Ns(3)), '.', 'Color', [0.4 0.55 0.05], 'MarkerSize', 15)
-    xlabel('# features'), ylabel('Cumulative explained variance')
-    title('Optimal number of features depending on the classifier')
+    xlabel('# features'), ylabel('Cumulative explained variance (%)')
+    title('Optimal number of features depending on the classifier fisher optimization')
     legend('cumulative explained variance', 'linear', 'Diag-linear', ...
         'Diag-quadratic', 'Location', 'best')
 
