@@ -1,4 +1,4 @@
-function class_error_test = nested_cv_fisher(trainData, trainLabels, outer_folds, inner_folds, classifier)
+function [class_error_test, is_stable] = nested_cv_fisher(trainData, trainLabels, outer_folds, inner_folds, classifier)
 
     outer_cvpartition = cvpartition(trainLabels,'kfold',outer_folds);
 
@@ -62,5 +62,7 @@ function class_error_test = nested_cv_fisher(trainData, trainLabels, outer_folds
     boxplot([optimal_training_error', optimal_val_error', class_error_test'], ...
         'Labels',{'Train error','Validation error', 'Test error'})
     title('Distribution of the different type of error, fisher optimization')
+    
+    is_stable = ttest(optimal_val_error, class_error_test);
 
 end
