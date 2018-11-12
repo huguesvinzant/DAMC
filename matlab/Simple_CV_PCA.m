@@ -35,18 +35,9 @@ subplot(1,2,2),
 imshow(Cov_PCA * 100),
 title('Covariance of the PCA data')
 
-%% simple CV (PCA)
-
-[min_errors_PCA, best_Ns_PCA, mean_explained_var_fold] = cv_pca(trainData,...
-    trainLabels, k, Classifiers);
-
-[min_error_pca, best_class_idx_pca] = min(min_errors_PCA);
-Best_classifier_pca = Classifiers{best_class_idx_pca};
-Best_var_fold = mean_explained_var_fold(best_Ns_PCA(best_class_idx_pca));
-
 %% Nested cross validation (PCA)
 
-[test_errors_pca, stable_pca] = nested_cv_pca(trainData, trainLabels,...
+test_errors_pca = nested_cv_pca(trainData, trainLabels,...
     outer_folds, inner_folds, Classifiers);
 
 mean_pca = mean(test_errors_pca);
@@ -55,17 +46,9 @@ std_pca = std(test_errors_pca);
 % t-test
 [h_pca, p_pca] = ttest(test_errors_pca, 0.5);
 
-%% simple CV (fisher)
-
-[min_errors_fisher, best_Ns_fisher] = cv_fisher(PCA_data, trainLabels, k,...
-    Classifiers, explained_var);
-
-[min_error_fisher, best_class_idx_fisher] = min(min_errors_fisher);
-Best_classifier_fisher = Classifiers{best_class_idx_fisher};
-
 %% Nested cross validation (fisher)
 
-[test_errors_fisher, stable_fisher] = nested_cv_fisher(PCA_data, trainLabels,...
+test_errors_fisher = nested_cv_fisher(PCA_data, trainLabels,...
     outer_folds, inner_folds, Classifiers);
 
 mean_fisher = mean(test_errors_fisher);
@@ -77,6 +60,15 @@ std_fisher = std(test_errors_fisher);
 %% Best model selection
 
 [h, p] = ttest(test_errors_fisher, test_errors_pca);
+
+%% simple CV (PCA)
+
+[min_errors_PCA, best_Ns_PCA, mean_explained_var_fold] = cv_pca(trainData,...
+    trainLabels, k, Classifiers);
+
+[min_error_pca, best_class_idx_pca] = min(min_errors_PCA);
+Best_classifier_pca = Classifiers{best_class_idx_pca};
+Best_var_fold = mean_explained_var_fold(best_Ns_PCA(best_class_idx_pca));
 
 %% Final model
 

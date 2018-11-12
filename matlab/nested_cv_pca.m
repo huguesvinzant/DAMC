@@ -1,4 +1,4 @@
-function [inner_class_error_test, is_stable] = nested_cv_pca(trainData, trainLabels, outer_folds, inner_folds, Classifiers)
+function outer_class_error_test = nested_cv_pca(trainData, trainLabels, outer_folds, inner_folds, Classifiers)
 
     outer_cvpartition = cvpartition(trainLabels,'kfold',outer_folds);
 
@@ -97,7 +97,7 @@ function [inner_class_error_test, is_stable] = nested_cv_pca(trainData, trainLab
         outer_label_prediction = predict(outer_classifier, outer_test_data_sel);
 
         % boxplot
-        outer_class_error_test(i) = class_error(outer_test_labels, outer_label_prediction)
+        outer_class_error_test(i) = class_error(outer_test_labels, outer_label_prediction);
         optimal_training_error(i) = mean_error_train_diaglin(i,best_N_diaglin(i));
         optimal_val_error(i) = min_error_diaglin(i);
     end
@@ -107,7 +107,5 @@ function [inner_class_error_test, is_stable] = nested_cv_pca(trainData, trainLab
     boxplot([optimal_training_error', optimal_val_error', outer_class_error_test'], ...
         'Labels',{'Train error','Validation error', 'Test error'})
     title('Distribution of the different type of error, PCA optimization')
-    
-    is_stable = ttest(optimal_val_error, outer_class_error_test);
 
 end
