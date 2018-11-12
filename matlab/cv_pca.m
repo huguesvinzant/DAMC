@@ -31,16 +31,12 @@ function [min_errors, best_Ns, mean_explained_var_fold] = cv_pca(trainData, trai
 
                 class_error_ = class_error(train_labels, label_prediction);
                 class_error_test = class_error(test_labels, label_prediction_te);
-
+                
                 if m == 1
-                    %linear_error(i,N_features) = class_error_;
-                    linear_error_te(i,N_features) = class_error_test;
-                end
-                if m == 2
                     %diaglinear_error(i,N_features) = class_error_;
                     diaglinear_error_te(i,N_features) = class_error_test;
                 end
-                if m == 3
+                if m == 2
                     %diagquadratic_error(i,N_features) = class_error_;
                     diagquadratic_error_te(i,N_features) = class_error_test;
                 end
@@ -51,38 +47,32 @@ function [min_errors, best_Ns, mean_explained_var_fold] = cv_pca(trainData, trai
     explained_var_fold(explained_var_fold == 0) = 100;
     mean_explained_var_fold = mean(explained_var_fold, 1);
 
-    linear_error_te(linear_error_te == 0) = 0.5;
     diaglinear_error_te(diaglinear_error_te == 0) = 0.5;
     diagquadratic_error_te(diagquadratic_error_te == 0) = 0.5;
 
-    [min_errors(1), best_Ns(1)] = min(mean(linear_error_te, 1));
-    [min_errors(2), best_Ns(2)] = min(mean(diaglinear_error_te, 1));
-    [min_errors(3), best_Ns(3)] = min(mean(diagquadratic_error_te, 1));
+    [min_errors(1), best_Ns(1)] = min(mean(diaglinear_error_te, 1));
+    [min_errors(2), best_Ns(2)] = min(mean(diagquadratic_error_te, 1));
     
     figure
     subplot(1,2,1)
-    plot(mean(linear_error_te, 1), 'Color', [0.2 0.47 0.7])
-    hold on
     plot(mean(diaglinear_error_te, 1), 'Color', [0.86 0.43 0.08])
-    plot(mean(diagquadratic_error_te, 1), 'Color', [0.4 0.55 0.05])
-    plot(best_Ns(1), min_errors(1), '.', 'Color', [0.2 0.47 0.7], 'MarkerSize', 15)
-    plot(best_Ns(2), min_errors(2), '.', 'Color', [0.86 0.43 0.08], 'MarkerSize', 15)
-    plot(best_Ns(3), min_errors(3), '.', 'Color', [0.4 0.55 0.05], 'MarkerSize', 15)
+    hold on
+    plot(mean(diagquadratic_error_te, 1), 'Color', [0.2 0.47 0.7])
+    plot(best_Ns(1), min_errors(1), '.', 'Color', [0.86 0.43 0.08], 'MarkerSize', 15)
+    plot(best_Ns(2), min_errors(2), '.', 'Color', [0.2 0.47 0.7], 'MarkerSize', 15)
     xlabel('# features'), ylabel('Class error')
     title('Test error in function of the classifier, PCA optimization')
-    legend('Linear', 'Diag-linear', 'Diag-quadratic', ...
-        'Linear minimum error', 'Diag-linear minimum error',...
+    legend('Diag-linear', 'Diag-quadratic', 'Diag-linear minimum error',...
         'Diag-quadratic minimum error', 'Location', 'best')
     
     subplot(1,2,2)
     plot(mean_explained_var_fold)
     hold on
-    plot(best_Ns(1), mean_explained_var_fold(best_Ns(1)), '.', 'Color', [0.2 0.47 0.7], 'MarkerSize', 15)
-    plot(best_Ns(2), mean_explained_var_fold(best_Ns(2)), '.', 'Color', [0.86 0.43 0.08], 'MarkerSize', 15)
-    plot(best_Ns(3), mean_explained_var_fold(best_Ns(3)), '.', 'Color', [0.4 0.55 0.05], 'MarkerSize', 15)
+    plot(best_Ns(1), mean_explained_var_fold(best_Ns(1)), '.', 'Color', [0.86 0.43 0.08], 'MarkerSize', 15)
+    plot(best_Ns(2), mean_explained_var_fold(best_Ns(2)), '.', 'Color', [0.2 0.47 0.78], 'MarkerSize', 15)
     xlabel('# features'), ylabel('Cumulative explained variance (%)')
     title('Optimal number of features depending on the classifier, PCA optimization')
-    legend('cumulative explained variance', 'linear', 'Diag-linear',...
+    legend('cumulative explained variance', 'Diag-linear',...
         'Diag-quadratic', 'Location', 'best')
 
 end

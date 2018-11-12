@@ -13,7 +13,7 @@ load('testSet.mat');
 k = 4;
 outer_folds = 5;
 inner_folds = 4;
-Classifiers = {'linear', 'diaglinear', 'diagquadratic'};
+Classifiers = {'diaglinear', 'diagquadratic'};
 
 [std_train_data, mu, sigma] = zscore(trainData);
 std_test_data = (testData - mu)./sigma;
@@ -47,7 +47,7 @@ Best_var_fold = mean_explained_var_fold(best_Ns_PCA(best_class_idx_pca));
 %% Nested cross validation (PCA)
 
 [test_errors_pca, stable_pca] = nested_cv_pca(trainData, trainLabels,...
-    outer_folds, inner_folds, Best_classifier_pca);
+    outer_folds, inner_folds, Classifiers);
 
 mean_pca = mean(test_errors_pca);
 std_pca = std(test_errors_pca);
@@ -65,8 +65,8 @@ Best_classifier_fisher = Classifiers{best_class_idx_fisher};
 
 %% Nested cross validation (fisher)
 
-[test_errors_fisher, stable_fisher] = nested_cv_pca(PCA_data, trainLabels,...
-    outer_folds, inner_folds, Best_classifier_fisher);
+[test_errors_fisher, stable_fisher] = nested_cv_fisher(PCA_data, trainLabels,...
+    outer_folds, inner_folds, Classifiers);
 
 mean_fisher = mean(test_errors_fisher);
 std_fisher = std(test_errors_fisher);
