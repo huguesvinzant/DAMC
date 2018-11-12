@@ -22,18 +22,25 @@ std_test_data = (testData - mu)./sigma;
 PCA_data = std_train_data * coeff;
 PCA_data_te = std_test_data * coeff;
 
+[orderedInd, ~] = rankfeat(trainData, trainLabels, 'fisher');
+
 %Covariance matrix of the original data 
 Cov = cov(trainData);
 %covariance matrix of the data projected on the PCs
 Cov_PCA = cov(PCA_data);
+%covariance matrix of the data ordered using fisher
+Cov_fisher = cov(trainData(:,orderedInd));
 
 figure
-subplot(1,2,1),
+subplot(1,3,1),
 imshow(Cov * 100),
 title('Covariance of the raw data')
-subplot(1,2,2),
+subplot(1,3,2),
 imshow(Cov_PCA * 100),
-title('Covariance of the PCA data')
+title('Covariance of the PC data')
+subplot(1,3,3),
+imshow(Cov_fisher * 100),
+title('Covariance of the fisher-ordered data')
 
 %% Nested cross validation (PCA)
 
