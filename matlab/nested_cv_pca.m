@@ -19,11 +19,15 @@ function [class_error_test, is_stable] = nested_cv_pca(trainData, trainLabels, o
             inner_train_data = outer_train_data(inner_indices == 0,:);
             inner_test_data = outer_train_data(inner_indices == 1,:);
             inner_test_labels = outer_train_labels(inner_indices == 1);
+            
+            [std_train_data, mu, sigma] = zscore(inner_train_data);
+            std_test_data = (inner_test_data - mu)./sigma;
 
-            [inner_coeff, inner_PCA_data, ~, ~, explained_var, mu] = pca(inner_train_data);
-            inner_PCA_data_te = (inner_test_data - mu) * inner_coeff;
-
-            inner_explained_var(j, 1:length(explained_var)) = cumsum(explained_var);
+            [inner_coeff, ~, ~, ~, explained_var] = pca(std_train_data);
+            inner_PCA_data = std_train_data * inner_coeff;
+            inner_PCA_data_te = std_test_data * inner_coeff;
+            
+            explained_var(j, 1:length(explained_var)) = cumsum(explained_var);
 
             for N_sel = 1:length(explained_var)
 
@@ -40,8 +44,8 @@ function [class_error_test, is_stable] = nested_cv_pca(trainData, trainLabels, o
             end
         end
 
-        inner_explained_var(inner_explained_var == 0) = 100;
-        mean_explained_var_fold = mean(inner_explained_var, 1);
+        explained_var(explained_var == 0) = 100;
+        mean_explained_var_fold = mean(explained_var, 1);
         
         error_train(error_train == 0) = 0.5;
         error_val(error_val == 0) = 0.5;
@@ -49,17 +53,22 @@ function [class_error_test, is_stable] = nested_cv_pca(trainData, trainLabels, o
         mean_error_val(i,:) = mean(error_val, 1);
         [min_error(i), best_N(i)] = min(mean_error_val(i,:));
         Best_var_fold(i) = mean_explained_var_fold(best_N(i));
+        
+        [outer_std_train_data, mu, sigma] = zscore(outer_train_data);
+        outer_std_test_data = (outer_test_data - mu)./sigma;
 
-        [outer_coeff, outer_PCA_data, ~, ~, explained_var, mu] = pca(outer_train_data);
-        outer_PCA_data_te = (outer_test_data - mu) * outer_coeff;
+        [outer_coeff, ~, ~, ~, outer_explained_var] = pca(outer_std_train_data);
+        outer_PCA_data = outer_std_train_data * outer_coeff;
+        outer_PCA_data_te = outer_std_test_data * outer_coeff;
 
-        explained_var = cumsum(explained_var);
-        features = find(explained_var < (Best_var_fold(i) + 1e-2) & explained_var > (Best_var_fold(i) - 1e-2));
-        [diff, ind] = min(explained_var(features) - Best_var_fold(i));
+        outer_explained_var = cumsum(outer_explained_var);
+        features = find(outer_explained_var < (Best_var_fold(i) + 1e-2) ...
+            & outer_explained_var > (Best_var_fold(i) - 1e-2));
+        [~, ind] = min(explained_var(features) - Best_var_fold(i));
         Best_N = features(ind);
 
-        outer_train_data_sel = outer_PCA_data(:,1:best_N(i));
-        outer_test_data_sel = outer_PCA_data_te(:,1:best_N(i));
+        outer_train_data_sel = outer_PCA_data(:,1:Best_N);
+        outer_test_data_sel = outer_PCA_data_te(:,1:Best_N);
         outer_classifier = fitcdiscr(outer_train_data_sel, outer_train_labels,...
             'Prior', 'uniform', 'discrimtype', classifier);
 
