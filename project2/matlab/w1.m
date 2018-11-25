@@ -133,21 +133,25 @@ txt3 = ['(' mat2str(round(min_Y_lin, 5)*10^4) 'e-4, ' mat2str(best_N_Y_lin) ')']
 txt4 = ['(' mat2str(round(min_Y_sec, 5)*10^4) 'e-4, ' mat2str(best_N_Y_sec) ')'];
 
 figure(3)
+
 subplot(2,2,1), plot(feature_vector, X_error_tr_lin), hold on,
 plot(feature_vector, X_error_te_lin), plot(best_N_X_lin, min_X_lin, 'kx'),
 xlabel('# features'), ylabel('MSE'), title('X position, linear regressor')
 legend('Train error','Test error', 'Optimal #features', 'Location', 'best')
 text(best_N_X_lin, min_X_lin, txt1, 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top');
+
 subplot(2,2,2), plot(feature_vector, X_error_tr_sec), hold on,
 plot(feature_vector, X_error_te_sec), plot(best_N_X_sec, min_X_sec, 'kx'),
 xlabel('# features'), ylabel('MSE'), title('X position, 2nd order regressor'),
 legend('Train error','Test error', 'Optimal #features', 'Location', 'best')
 text(best_N_X_sec, min_X_sec, txt2, 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top');
+
 subplot(2,2,3), plot(feature_vector, Y_error_tr_lin), hold on,
 plot(feature_vector, Y_error_te_lin), plot(best_N_Y_lin, min_Y_lin, 'kx'),
 xlabel('# features'), ylabel('MSE'), title('Y position, linear regressor'),
 legend('Train error','Test error', 'Optimal #features', 'Location', 'best')
 text(best_N_Y_lin, min_Y_lin, txt3, 'HorizontalAlignment', 'center', 'VerticalAlignment', 'top');
+
 subplot(2,2,4), plot(feature_vector, Y_error_tr_sec), hold on,
 plot(feature_vector, Y_error_te_sec), plot(best_N_Y_sec, min_Y_sec, 'kx'),
 xlabel('# features'), ylabel('MSE'), title('Y position, 2nd order regressor'),
