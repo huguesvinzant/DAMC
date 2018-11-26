@@ -223,10 +223,5 @@ for alpha = linspace(0.2,1,4)
     i=i+1
 end
 
-[min_X_error_te_elastic, ind_min_X_error] = min(X_error_te_elastic);
-min_lambda_X = min_lambda_X_elastic(ind_min_X_error);
-min_alpha_X = 0.2*ind_min_X_error;
-
-[min_Y_error_te_elastic, ind_min_Y_error] = min(Y_error_te_elastic);
-min_lambda_Y = min_lambda_Y_elastic(ind_min_Y_error);
-min_alpha_Y = 0.2*ind_min_Y_error;
+(min_X_error_te_elastic, ind_min_error) = min(X_error_te_elastic);
+min_Y_error_te_elastic = min(Y_error_te_elastic);
