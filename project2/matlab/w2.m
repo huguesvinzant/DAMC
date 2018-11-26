@@ -105,12 +105,12 @@ ylabel('MSE');
 [min_MSE_X, ind_x] = min(STATS_X.MSE);
 min_lambda_X = lambda(ind_x);
 beta_X = B_X(:,ind_x);
-intercept_X = STATS.Intercept(ind_x);
+intercept_X = STATS_X.Intercept(ind_x);
 
 [min_MSE_Y, ind_y] = min(STATS_Y.MSE);
 min_lambda_Y = lambda(ind_y);
 beta_Y = B_Y(:,ind_y);
-intercept_Y = STATS.Intercept(ind_y);
+intercept_Y = STATS_Y.Intercept(ind_y);
 
 %Regressing the data using the best beta and intercept (found using lambda)
 X_reg = regress(testPosX, testData);
