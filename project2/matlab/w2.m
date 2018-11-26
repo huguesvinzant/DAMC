@@ -125,3 +125,34 @@ subplot(1,2,1), plot(testPosX), hold on, plot(testData*X_reg),
 legend('PosX','Predicted PosX'), title('PosX test set compared to its regressed version')
 subplot(1,2,2), plot(testPosY), hold on, plot(testData*Y_reg),
 legend('PosX','Predicted PosX'), title('PosY test set compared to its regressed version')
+
+
+%% Elastic nets
+
+alpha = 0.5;
+lambda = logspace(-10, 0, 15);
+
+[B_X_elastic, STATS_X_elastic] = lasso(trainData, trainPosX, 'Alpha', alpha, 'Lambda', lambda, 'CV', 10);
+
+[B_Y_elastic, STATS_Y_elastic] = lasso(trainData, trainPosX, 'Alpha', alpha,'Lambda', lambda, 'CV', 10);
+
+figure(4) % plot of the non-zero weights with alpha
+
+subplot(1,2,1)
+semilogx(lambda, STATS_X_elastic.DF);
+hold on
+semilogx(lambda, STATS_X.DF);
+legend('elastic', 'lasso');
+title('Number of non-zero weights as a function of lambda for PosX');
+xlabel('Lambda values');
+ylabel('Number of non-zero weights');
+hold on;
+
+subplot(1,2,2)
+semilogx(lambda, STATS_Y_elastic.DF);
+hold on;
+semilogx(lambda, STATS_X.DF);
+legend('elastic', 'lasso');
+title('Number of non-zero weights as a function of lambda for PosY');
+xlabel('Lambda values');
+ylabel('Number of non-zero weights');
