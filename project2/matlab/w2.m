@@ -138,7 +138,8 @@ lambda = logspace(-10, 0, 15);
 
 figure(4) % plot of the non-zero weights with alpha
 
-%Comparison between elastic net and lassosubplot(1,2,1)
+%Comparison between elastic net and lasso
+subplot(1,2,1)
 semilogx(lambda, STATS_X_elastic.DF);
 hold on
 semilogx(lambda, STATS_X.DF);
@@ -146,7 +147,6 @@ legend('elastic', 'lasso');
 title('Number of non-zero weights as a function of lambda for PosX');
 xlabel('Lambda values');
 ylabel('Number of non-zero weights');
-hold on;
 
 subplot(1,2,2)
 semilogx(lambda, STATS_Y_elastic.DF);
@@ -159,6 +159,27 @@ ylabel('Number of non-zero weights');
 
 %For the lambda value corresponding to the best MSE, use the corresponding
 %beta and intercept to regress the test data (PosX, PosY).
+
+figure(5) %plot of the MSE with lambda.
+
+subplot(1,2,1)
+semilogx(lambda, STATS_X_elastic.MSE);
+hold on;
+semilogx(lambda, STATS_X.MSE);
+title('Mean square error (MSE) as a function of lambda for PosX');
+legend('elastic', 'lasso');
+xlabel('Lambda values');
+ylabel('MSE');
+hold on;
+
+subplot(1,2,2)
+semilogx(lambda, STATS_Y_elastic.MSE);
+hold on;
+semilogx(lambda, STATS_Y.MSE);
+title('Mean square error (MSE) as a function of lambda for PosY');
+legend('elastic', 'lasso');
+xlabel('Lambda values');
+ylabel('MSE');
 
 [min_MSE_X_elastic, ind_x_elastic] = min(STATS_X_elastic.MSE);
 min_lambda_X_elastic = lambda(ind_x_elastic);
@@ -179,7 +200,7 @@ Y_reg_elastic = regress(testPosY, testData);
 Y_error_te_elastic = immse(testPosY, testData*Y_reg_elastic);
 
 %Plot
-figure(5)
+figure(6)
 subplot(2,2,1), plot(testPosX), hold on, plot(testData*X_reg_elastic),
 legend('PosX','Predicted PosX'), title('PosX test set compared to its elastic regressed version')
 subplot(2,2,2), plot(testPosY), hold on, plot(testData*Y_reg_elastic),
