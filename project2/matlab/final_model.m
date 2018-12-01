@@ -34,8 +34,8 @@ testPosY = PosY(n_val_test+1:end);
 
 %% Hyperparameter selection
 
-groups = 50;
-N_max = 300;
+groups = 20;
+N_max = 400;
 
 [X_err_tr, X_err_val, Y_err_tr, Y_err_val] = hp_selection(trainData_PCA, ...
     valData_PCA, trainPosX, trainPosY, valPosX, valPosY, groups, N_max);
