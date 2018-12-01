@@ -42,7 +42,7 @@ N_max = 300;
 
 %% Plots
 
-a = groups:groups:300;
+a = groups:groups:N_max;
 subplot(2,2,1), plot(a, X_err_val), xlabel('# Principal components'),
 ylabel('MSE'), title('Testing error in position X'), 
 legend('1st order', '2nd order', '3rd order', 'Location', 'best')
