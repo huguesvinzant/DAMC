@@ -45,17 +45,17 @@ N_max = 700;
 figure
 a = groups:groups:N_max;
 subplot(2,2,1), plot(a, X_err_val), xlabel('# Principal components'),
-ylabel('MSE'), title('Testing error in position X'), 
+ylabel('MSE'), title('Validation mean squared error in position X'), 
 legend('1st order', '2nd order', '3rd order', 'Location', 'best')
-subplot(2,2,2), plot(a, (X_err_val-X_err_tr)./X_err_tr), xlabel('# Principal components'),
-ylabel('MSE'), title('Absolute error in position X'),
+subplot(2,2,2), plot(a, (X_err_val-X_err_tr)), xlabel('# Principal components'),
+ylabel('Error difference'), title('Error difference between validation and training in position X'),
 legend('1st order', '2nd order', '3rd order', 'Location', 'best')
 
 subplot(2,2,3), plot(a, Y_err_val), xlabel('# Principal components'),
-ylabel('MSE'), title('Testing error in position Y'), 
+ylabel('MSE'), title('Validation mean squared error in position Y'), 
 legend('1st order', '2nd order', '3rd order', 'Location', 'best')
-subplot(2,2,4), plot(a, (Y_err_val-Y_err_tr)./Y_err_tr), xlabel('# Principal components'),
-ylabel('MSE'), title('Absolute error in position Y'),
+subplot(2,2,4), plot(a, (Y_err_val-Y_err_tr)), xlabel('# Principal components'),
+ylabel('Error difference'), title('Error difference between validation and training in position Y'),
 legend('1st order', '2nd order', '3rd order', 'Location', 'best')
 
 %% Best parameters
