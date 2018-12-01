@@ -30,20 +30,23 @@ testPosY = PosY(n_val_test+1:end);
 
 %% PCA
 
+%We apply PCA with a function we implemented, it standardizes the data, and
+%coefficient of the PCs are reused to apply the PCA on the validation and 
+%testing set. It also returns the cumulative explained variance of the PCs.
 [trainData_PCA, valData_PCA, exp_var] = std_pca(trainData, valData);
 
 %% Hyperparameter selection
 
-groups = 20;
-N_max = 700;
+groups_of_features = 20;
+N_feature_max = 700;
 
 [X_err_tr, X_err_val, Y_err_tr, Y_err_val] = hp_selection(trainData_PCA, ...
-    valData_PCA, trainPosX, trainPosY, valPosX, valPosY, groups, N_max);
+    valData_PCA, trainPosX, trainPosY, valPosX, valPosY, groups_of_features, N_feature_max);
 
 %% Plots
 
 figure
-a = groups:groups:N_max;
+a = groups_of_features:groups_of_features:N_feature_max;
 subplot(2,2,1), plot(a, X_err_val), xlabel('# Principal components'),
 ylabel('MSE'), title('Validation mean squared error in position X'), 
 legend('1st order', '2nd order', '3rd order', 'Location', 'best')
@@ -60,8 +63,8 @@ legend('1st order', '2nd order', '3rd order', 'Location', 'best')
 
 %% Best parameters
 
-[best_degree_X, best_var_X] = find_best_hp(X_err_val, groups, exp_var);
-[best_degree_Y, best_var_Y] = find_best_hp(Y_err_val, groups, exp_var);
+[best_degree_X, best_var_X] = find_best_hp(X_err_val, groups_of_features, exp_var);
+[best_degree_Y, best_var_Y] = find_best_hp(Y_err_val, groups_of_features, exp_var);
 
 %% Final model
 
