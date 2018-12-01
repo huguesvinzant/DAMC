@@ -106,48 +106,46 @@ subplot(2,2,4), plot(testPosY), hold on, plot(second_testData_PCA*coeff_PosY_sec
 legend('PosY','Predicted PosY'), title('Test')
 
 %% Loop
+
 %We implement now a loop to gradually include features when training our 
 %regressors.
-n_features = size(trainData_PCA,2);
+subset_N = 10;
 
-j = 1;
-for i = 1:n_features
+for i = subset_N:subset_N:450
     %Instead of including the features one by one, we include features by 
-    %steps of 50 for accelerating the computation.
-    if mod(i,50) == 0
-    
-        train = trainData_PCA(:,1:i);
-        test = testData_PCA(:,1:i);
+    %steps of subset_N for accelerating the computation.
+    j = i/subset_N;
 
-        I_train = ones(size(train,1),1);
-        I_test = ones(size(test,1),1);
-        linear_train = [I_train train];
-        linear_test = [I_test test];
-        second_train = [I_train train train.^2];
-        second_test = [I_test test test.^2];
-        
-        %Linear regressor for XPos
-        X_regressor_linear = regress(trainPosX, linear_train);
-        X_error_tr_lin(j) = immse(trainPosX, linear_train*X_regressor_linear);
-        X_error_te_lin(j) = immse(testPosX, linear_test*X_regressor_linear);
-        
-        %Linear regressor for YPos
-        Y_regressor_linear = regress(trainPosY, linear_train);
-        Y_error_tr_lin(j) = immse(trainPosY, linear_train*Y_regressor_linear);
-        Y_error_te_lin(j) = immse(testPosY, linear_test*Y_regressor_linear);
-        
-        %2nd order polynomial regressor for XPos
-        X_regressor_second = regress(trainPosX, second_train);
-        X_error_tr_sec(j) = immse(trainPosX, second_train*X_regressor_second);
-        X_error_te_sec(j) = immse(testPosX, second_test*X_regressor_second);
-        
-        %2nd order polynomial regressor for YPos
-        Y_regressor_second = regress(trainPosY, second_train);
-        Y_error_tr_sec(j) = immse(trainPosY, second_train*Y_regressor_second);
-        Y_error_te_sec(j) = immse(testPosY, second_test*Y_regressor_second);
-        
-        j = j+1
-    end
+    train = PCA_data(:,1:i);
+    test = PCA_data_te(:,1:i);
+
+    I_train = ones(size(train,1),1);
+    I_test = ones(size(test,1),1);
+    linear_train = [I_train train];
+    linear_test = [I_test test];
+    second_train = [I_train train train.^2];
+    second_test = [I_test test test.^2];
+
+    %Linear regressor for XPos
+    X_regressor_linear = regress(trainPosX, linear_train);
+    X_error_tr_lin(j) = immse(trainPosX, linear_train*X_regressor_linear);
+    X_error_te_lin(j) = immse(testPosX, linear_test*X_regressor_linear);
+
+    %Linear regressor for XPos
+    Y_regressor_linear = regress(trainPosY, linear_train);
+    Y_error_tr_lin(j) = immse(trainPosY, linear_train*Y_regressor_linear);
+    Y_error_te_lin(j) = immse(testPosY, linear_test*Y_regressor_linear);
+
+    %2nd order polynomial regressor for XPos
+    X_regressor_second = regress(trainPosX, second_train);
+    X_error_tr_sec(j) = immse(trainPosX, second_train*X_regressor_second);
+    X_error_te_sec(j) = immse(testPosX, second_test*X_regressor_second);
+
+    %2nd order polynomial regressor for YPos
+    Y_regressor_second = regress(trainPosY, second_train);
+    Y_error_tr_sec(j) = immse(trainPosY, second_train*Y_regressor_second);
+    Y_error_te_sec(j) = immse(testPosY, second_test*Y_regressor_second);
+    
 end
 
 % Plot of the real vectors and the regressed ones for both PosX and PosY,
