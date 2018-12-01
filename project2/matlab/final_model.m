@@ -35,13 +35,14 @@ testPosY = PosY(n_val_test+1:end);
 %% Hyperparameter selection
 
 groups = 20;
-N_max = 400;
+N_max = 700;
 
 [X_err_tr, X_err_val, Y_err_tr, Y_err_val] = hp_selection(trainData_PCA, ...
     valData_PCA, trainPosX, trainPosY, valPosX, valPosY, groups, N_max);
 
 %% Plots
 
+figure
 a = groups:groups:N_max;
 subplot(2,2,1), plot(a, X_err_val), xlabel('# Principal components'),
 ylabel('MSE'), title('Testing error in position X'), 
