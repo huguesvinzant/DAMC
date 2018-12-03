@@ -38,7 +38,7 @@ testPosY = PosY(n_val_test+1:end);
 %% Hyperparameter selection
 
 groups_of_features = 20;
-N_feature_max = 700;
+N_feature_max = 960;
 
 [X_err_tr, X_err_val, Y_err_tr, Y_err_val] = hp_selection(trainData_PCA, ...
     valData_PCA, trainPosX, trainPosY, valPosX, valPosY, groups_of_features, N_feature_max);
@@ -47,19 +47,24 @@ N_feature_max = 700;
 
 figure
 a = groups_of_features:groups_of_features:N_feature_max;
-subplot(2,2,1), plot(a, X_err_val), xlabel('# Principal components'),
-ylabel('MSE'), title('Validation mean squared error in position X'), 
-legend('1st order', '2nd order', '3rd order', 'Location', 'best')
-subplot(2,2,2), plot(a, (X_err_val-X_err_tr)), xlabel('# Principal components'),
-ylabel('Error difference'), title('Error difference between validation and training in position X'),
-legend('1st order', '2nd order', '3rd order', 'Location', 'best')
+txt1 = ['(' mat2str(round(min(min(X_err_val)), 5)*10^4) 'e-4, ' mat2str(300) ')'];
+txt2 = ['(' mat2str(round(min(min(Y_err_val)), 5)*10^4) 'e-4, ' mat2str(60) ')'];
 
-subplot(2,2,3), plot(a, Y_err_val), xlabel('# Principal components'),
-ylabel('MSE'), title('Validation mean squared error in position Y'), 
-legend('1st order', '2nd order', '3rd order', 'Location', 'best')
-subplot(2,2,4), plot(a, (Y_err_val-Y_err_tr)), xlabel('# Principal components'),
-ylabel('Error difference'), title('Error difference between validation and training in position Y'),
-legend('1st order', '2nd order', '3rd order', 'Location', 'best')
+subplot(1,2,1), plot(a, X_err_val), hold on, plot(a, X_err_tr, '--'),
+plot(300, min(min(X_err_val)), 'x'),
+xlabel('# Principal components', 'FontSize', 15), 
+ylabel('Mean Squared Error', 'FontSize', 15), 
+title('Training and validation MSE in position X', 'FontSize', 20), 
+legend({'1st order test', '2nd order test', '3rd order test', ...
+    '1st order train', '2nd order train', '3rd order train', 'Minimum error'}, ...
+    'FontSize', 10, 'Location', 'best')
+
+a = groups_of_features:groups_of_features:N_feature_max;
+subplot(1,2,2), plot(a, Y_err_val), hold on, plot(a, Y_err_tr, '--'),
+plot(60, min(min(Y_err_val)), 'x'),
+xlabel('# Principal components', 'FontSize', 15), 
+ylabel('Mean Squared Error', 'FontSize', 15), 
+title('Training and validation MSE in position Y', 'FontSize', 20)
 
 %% Best parameters
 
