@@ -7,10 +7,10 @@ load('Data.mat')
 
 %% Dataset partitioning 
 
-%We define a 70% - 10% - 20% data partitioning (train, val, test)
+%We define a 80% - 15% - 5% data partitioning (train, val, test)
 
 n_samples = length(Data);
-n_train_val = ceil(0.7*n_samples);
+n_train_val = ceil(0.4*n_samples);
 n_val_test = ceil(0.8*n_samples);
 
 %training set
@@ -37,21 +37,24 @@ testPosY = PosY(n_val_test+1:end);
 
 %% Hyperparameter selection
 
-groups_of_features = 60;
+groups_of_features = 20;
 N_feature_max = 300;
 
 [X_err_tr, X_err_val, Y_err_tr, Y_err_val] = hp_selection(trainData_PCA, ...
     valData_PCA, trainPosX, trainPosY, valPosX, valPosY, groups_of_features, N_feature_max);
 
+%% Best parameters
+
+[best_degree_X, best_PC_X, best_var_X] = find_best_hp(X_err_val, groups_of_features, exp_var);
+[best_degree_Y, best_PC_Y, best_var_Y] = find_best_hp(Y_err_val, groups_of_features, exp_var);
+
 %% Plots
 
 figure
 a = groups_of_features:groups_of_features:N_feature_max;
-txt1 = ['(' mat2str(round(min(min(X_err_val)), 5)*10^4) 'e-4, ' mat2str(300) ')'];
-txt2 = ['(' mat2str(round(min(min(Y_err_val)), 5)*10^4) 'e-4, ' mat2str(60) ')'];
 
 subplot(1,2,1), plot(a, X_err_val), hold on, plot(a, X_err_tr, '--'),
-plot(300, min(min(X_err_val)), 'x'),
+plot(best_PC_X, min(min(X_err_val)), 'x'),
 xlabel('# Principal components', 'FontSize', 15), 
 ylabel('Mean Squared Error', 'FontSize', 15), 
 title('Training and validation MSE in position X', 'FontSize', 20), 
@@ -61,15 +64,10 @@ legend({'1st order test', '2nd order test', '3rd order test', ...
 
 a = groups_of_features:groups_of_features:N_feature_max;
 subplot(1,2,2), plot(a, Y_err_val), hold on, plot(a, Y_err_tr, '--'),
-plot(60, min(min(Y_err_val)), 'x'),
+plot(best_PC_Y, min(min(Y_err_val)), 'x'),
 xlabel('# Principal components', 'FontSize', 15), 
 ylabel('Mean Squared Error', 'FontSize', 15), 
 title('Training and validation MSE in position Y', 'FontSize', 20)
-
-%% Best parameters
-
-[best_degree_X, best_var_X] = find_best_hp(X_err_val, groups_of_features, exp_var);
-[best_degree_Y, best_var_Y] = find_best_hp(Y_err_val, groups_of_features, exp_var);
 
 %% Final model
 
@@ -82,8 +80,8 @@ trainPosY_final = [trainPosY; valPosY];
 [trainData_PCA_final, testData_PCA, exp_var] = std_pca(trainData_final, testData);
 
 %find best number of PC from the explained variance
-best_PC_X = var_to_PC(exp_var, best_var_X);
-best_PC_Y = var_to_PC(exp_var, best_var_Y);
+best_PC_X_final = var_to_PC(exp_var, best_var_X);
+best_PC_Y_final = var_to_PC(exp_var, best_var_Y);
 
 %build polynomes according to the best hp found above
 [poly_trainX, poly_testX] = build_poly(trainData_final, testData, best_degree_X, best_PC_X);
@@ -95,8 +93,7 @@ best_PC_Y = var_to_PC(exp_var, best_var_Y);
 [~, final_error_Y, predicted_Y] = ...
     regression_error(poly_trainY, poly_testY, trainPosY_final, testPosY);
 
-%% Last plot
+%%
 
-figure
-subplot(1,2,1), plot(testPosX), hold on, plot(predicted_X)
-subplot(1,2,2), plot(testPosY), hold on, plot(predicted_Y)
+final_error_X_sqrt = sqrt(final_error_X)
+final_error_Y_sqrt = sqrt(final_error_Y)

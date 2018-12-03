@@ -1,4 +1,4 @@
-function [best_degree, best_var] = find_best_hp(validation_error, groups, exp_var)
+function [best_degree, best_PC, best_var] = find_best_hp(validation_error, groups, exp_var)
 
     [min_PC, ind_PC] = min(validation_error);
 
