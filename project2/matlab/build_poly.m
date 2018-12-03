@@ -3,8 +3,8 @@ function [poly_train, poly_test] = build_poly(trainData, testData, degree, best_
     I_train = ones(size(trainData,1),1);
     I_test = ones(size(testData,1),1);
     
-    train = trainData(:,best_PC);
-    test = testData(:,best_PC);
+    train = trainData(:,1:best_PC);
+    test = testData(:,1:best_PC);
     
     if degree == 1
         poly_train = [I_train train];

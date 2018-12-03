@@ -37,8 +37,8 @@ testPosY = PosY(n_val_test+1:end);
 
 %% Hyperparameter selection
 
-groups_of_features = 20;
-N_feature_max = 960;
+groups_of_features = 60;
+N_feature_max = 300;
 
 [X_err_tr, X_err_val, Y_err_tr, Y_err_val] = hp_selection(trainData_PCA, ...
     valData_PCA, trainPosX, trainPosY, valPosX, valPosY, groups_of_features, N_feature_max);
@@ -90,5 +90,13 @@ best_PC_Y = var_to_PC(exp_var, best_var_Y);
 [poly_trainY, poly_testY] = build_poly(trainData_final, testData, best_degree_Y, best_PC_Y);
 
 %fit the final model
-[~, final_error_X] = regression_error(poly_trainX, poly_testX, trainPosX_final, testPosX);
-[~, final_error_Y] = regression_error(poly_trainY, poly_testY, trainPosY_final, testPosY);
+[~, final_error_X, predicted_X] = ...
+    regression_error(poly_trainX, poly_testX, trainPosX_final, testPosX);
+[~, final_error_Y, predicted_Y] = ...
+    regression_error(poly_trainY, poly_testY, trainPosY_final, testPosY);
+
+%% Last plot
+
+figure
+subplot(1,2,1), plot(testPosX), hold on, plot(predicted_X)
+subplot(1,2,2), plot(testPosY), hold on, plot(predicted_Y)
