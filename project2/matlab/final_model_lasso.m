@@ -7,11 +7,11 @@ load('Data.mat')
 
 %% Dataset partitioning 
 
-%We define a 80% - 15% - 5% data partitioning (train, val, test)
+%We define a 40% - 40% - 20% data partitioning (train, val, test)
 
 n_samples = length(Data);
-n_train_val = ceil(0.3*n_samples);
-n_val_test = ceil(0.7*n_samples);
+n_train_val = ceil(0.4*n_samples);
+n_val_test = ceil(0.4*n_samples);
 
 %training set
 trainData = Data(1:n_train_val,:);
@@ -33,14 +33,14 @@ testPosY = PosY(n_val_test+1:end);
 %We apply PCA with a function we implemented, it standardizes the data, and
 %coefficient of the PCs are reused to apply the PCA on the validation and 
 %testing set. It also returns the cumulative explained variance of the PCs.
-[trainData_PCA, valData_PCA, exp_var] = std_pca(trainData, valData);
+[trainData_PCA, valData_PCA] = std_pca(trainData, valData);
 
 %% Hyperparameter selection
 
 alphas = linspace(0.2, 1, 5);
 lambdas = logspace(-5, -2, 20);
 
-[X_err_tr, X_err_val, Y_err_tr, Y_err_val, DF_X, DF_Y] = hp_selection_elastic(...
+[X_err_tr, X_err_val, Y_err_tr, Y_err_val, DF_X, DF_Y] = hp_selection_lasso(...
     trainData_PCA, valData_PCA, trainPosX, trainPosY, valPosX, valPosY, ...
     alphas, lambdas);
 
@@ -74,7 +74,33 @@ for i = 1:length(alphas)
     
 end
 
-%%
+%% Find best parameters
 
-[alpha_X, lambda_X] = find_best_hp_elastic(X_err_val, alphas, lambdas);
-[alpha_Y, lambda_Y] = find_best_hp_elastic(Y_err_val, alphas, lambdas);
+[alpha_X, lambda_X] = find_best_hp_lasso(X_err_val, alphas, lambdas);
+[alpha_Y, lambda_Y] = find_best_hp_lasso(Y_err_val, alphas, lambdas);
+
+%% 
+
+%merge training and validation data for final training
+trainData_final = [trainData; valData];
+trainPosX_final = [trainPosX; valPosX];
+trainPosY_final = [trainPosY; valPosY];
+
+%compute the pca of the final training and testing data
+[trainData_PCA_final, testData_PCA] = std_pca(trainData_final, testData);
+
+%generating model
+[B_X, STATS_X] = lasso(trainData_PCA_final, trainPosX_final, ...
+    'Alpha', alpha_X, 'Lambda', lambda_X);
+[B_Y, STATS_Y] = lasso(trainData_PCA_final, trainPosY_final, ...
+    'Alpha', alpha_Y,'Lambda', lambda_Y);
+
+%making predictions
+pred_X = testData_PCA*B_X + STATS_X.Intercept;
+pred_Y = testData_PCA*B_Y + STATS_Y.Intercept;
+
+%testing errors
+error_X = immse(testPosX, pred_X);
+error_Y = immse(testPosY, pred_Y);
+error_X_sqrt = sqrt(error_X)
+error_Y_sqrt = sqrt(error_Y)

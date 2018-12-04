@@ -7,7 +7,7 @@ load('Data.mat')
 
 %% Dataset partitioning 
 
-%We define a 80% - 15% - 5% data partitioning (train, val, test)
+%We define a 40% - 40% - 20% data partitioning (train, val, test)
 
 n_samples = length(Data);
 n_train_val = ceil(0.4*n_samples);
@@ -38,15 +38,15 @@ testPosY = PosY(n_val_test+1:end);
 %% Hyperparameter selection
 
 groups_of_features = 20;
-N_feature_max = 300;
+N_feature_max = 400;
 
-[X_err_tr, X_err_val, Y_err_tr, Y_err_val] = hp_selection(trainData_PCA, ...
+[X_err_tr, X_err_val, Y_err_tr, Y_err_val] = hp_selection_regress(trainData_PCA, ...
     valData_PCA, trainPosX, trainPosY, valPosX, valPosY, groups_of_features, N_feature_max);
 
 %% Best parameters
 
-[best_degree_X, best_PC_X, best_var_X] = find_best_hp(X_err_val, groups_of_features, exp_var);
-[best_degree_Y, best_PC_Y, best_var_Y] = find_best_hp(Y_err_val, groups_of_features, exp_var);
+[best_degree_X, best_PC_X, best_var_X] = find_best_hp_regress(X_err_val, groups_of_features, exp_var);
+[best_degree_Y, best_PC_Y, best_var_Y] = find_best_hp_regress(Y_err_val, groups_of_features, exp_var);
 
 %% Plots
 

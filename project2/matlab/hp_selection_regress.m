@@ -5,7 +5,7 @@ function [X_err_tr, X_err_val, Y_err_tr, Y_err_val] = hp_selection(trainData_PCA
         %Instead of including the features one by one, we include features 
         %by steps of groups_of_features for accelerating the computation.
         k = i/groups_of_features;
-        disp(i) %NE PAS OUBLIER DE SUPPRIMER !!!
+        disp(i)
 
         train = trainData_PCA(:,1:i);
         test = valData_PCA(:,1:i);
