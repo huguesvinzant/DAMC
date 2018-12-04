@@ -11,7 +11,7 @@ load('Data.mat')
 
 n_samples = length(Data);
 n_train_val = ceil(0.4*n_samples);
-n_val_test = ceil(0.4*n_samples);
+n_val_test = ceil(0.8*n_samples);
 
 %training set
 trainData = Data(1:n_train_val,:);
