@@ -7,11 +7,11 @@ load('Data.mat')
 
 %% Dataset partitioning 
 
-%We define a 40% - 40% - 20% data partitioning (train, val, test)
+%We define a 30% - 40% - 30% data partitioning (train, val, test)
 
 n_samples = length(Data);
-n_train_val = ceil(0.4*n_samples);
-n_val_test = ceil(0.8*n_samples);
+n_train_val = ceil(0.3*n_samples);
+n_val_test = ceil(0.7*n_samples);
 
 %training set
 trainData = Data(1:n_train_val,:);
@@ -38,7 +38,7 @@ testPosY = PosY(n_val_test+1:end);
 %% Hyperparameter selection
 
 groups_of_features = 20;
-N_feature_max = 400;
+N_feature_max = 960;
 
 [X_err_tr, X_err_val, Y_err_tr, Y_err_val] = hp_selection_regress(trainData_PCA, ...
     valData_PCA, trainPosX, trainPosY, valPosX, valPosY, groups_of_features, N_feature_max);
@@ -53,21 +53,21 @@ N_feature_max = 400;
 figure
 a = groups_of_features:groups_of_features:N_feature_max;
 
-subplot(1,2,1), plot(a, X_err_val), hold on, plot(a, X_err_tr, '--'),
+subplot(1,2,1), plot(a, X_err_val, 'LineWidth',2), hold on, plot(a, X_err_tr, '--'),
 plot(best_PC_X, min(min(X_err_val)), 'x'),
 xlabel('# Principal components', 'FontSize', 15), 
 ylabel('Mean Squared Error', 'FontSize', 15), 
-title('Training and validation MSE in position X', 'FontSize', 20), 
+title('Training and validation MSE in position X', 'FontSize', 17), 
 legend({'1st order test', '2nd order test', '3rd order test', ...
     '1st order train', '2nd order train', '3rd order train', 'Minimum error'}, ...
     'FontSize', 10, 'Location', 'best')
 
 a = groups_of_features:groups_of_features:N_feature_max;
-subplot(1,2,2), plot(a, Y_err_val), hold on, plot(a, Y_err_tr, '--'),
+subplot(1,2,2), plot(a, Y_err_val, 'LineWidth',2), hold on, plot(a, Y_err_tr, '--'),
 plot(best_PC_Y, min(min(Y_err_val)), 'x'),
 xlabel('# Principal components', 'FontSize', 15), 
 ylabel('Mean Squared Error', 'FontSize', 15), 
-title('Training and validation MSE in position Y', 'FontSize', 20)
+title('Training and validation MSE in position Y', 'FontSize', 17)
 
 %% Final model
 
